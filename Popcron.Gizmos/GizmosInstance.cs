@@ -111,6 +111,7 @@ namespace Popcron
             GL.PushMatrix();
             GL.Begin(GL.LINES);
 
+            //draw elements
             for (int e = 0; e < elements.Count; e++)
             {
                 GL.Color(elements[e].Color);
@@ -121,6 +122,7 @@ namespace Popcron
                 }
             }
 
+            //clear elemenets
             elements.Clear();
 
             GL.End();
