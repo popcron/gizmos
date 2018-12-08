@@ -15,8 +15,13 @@ using Gizmos = Popcron.Gizmos;
 
 public class GizmoDrawer : MonoBehaviour
 {
+    public Material material = null;
+
     private void Update()
     {
+        //use custom material, if null it uses a default line material
+        Gizmos.Material = material;
+        
         //toggle gizmo drawing using the same key as in minecwaft
         if (Input.GetKeyDown(KeyCode.F3))
         {
