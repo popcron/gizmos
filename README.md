@@ -7,6 +7,11 @@ Used for drawing runtime gizmos in builds and editor from any context in the cod
 ## Installation
 Add the .dll file to the Plugins folder.
 
+If using 2018.3.x, you can add a new entry to the manifest.json file in your Packages folder:
+```json
+"com.popcron.gizmos": "https://github.com/popcron/gizmos.git#unity"
+```
+
 ## Example
 ```cs
 using UnityEngine;
