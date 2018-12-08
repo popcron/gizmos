@@ -4,6 +4,9 @@ Used for drawing runtime gizmos in builds and editor from any context in the cod
 ## Requirements
 - .NET Framework 3.5
 
+## Installation
+Add the .dll file to the Plugins folder.
+
 ## Example
 ```cs
 using UnityEngine;
@@ -28,3 +31,10 @@ public class GizmoDrawer : MonoBehaviour
     }
 }
 ```
+
+## Custom drawers
+The ability to add custom drawers is possible. Inherit from the `Drawer` class and implement the `Draw` method. To see an example of drawing a line using a custom drawer, look at the `Line.cs` file.
+
+## FAQ
+- **What namespace?** Popcron
+- **Does it work in builds?** Yes
