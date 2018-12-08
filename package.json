@@ -1,0 +1,7 @@
+{
+    "name": "com.popcron.gizmos",
+    "displayName": "Gizmos",
+    "version": "0.1",
+    "unity": "2018.2.5f1",
+    "description": "GL Gizmo utility for debugging."
+}
