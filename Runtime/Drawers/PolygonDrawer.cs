@@ -2,7 +2,7 @@
 
 namespace Popcron
 {
-    public class Polygon : Drawer
+    public class PolygonDrawer : Drawer
     {
         public override Vector3[] Draw(params object[] values)
         {

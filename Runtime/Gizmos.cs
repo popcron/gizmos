@@ -60,7 +60,7 @@ namespace Popcron
         /// <param name="color"></param>
         public static void Line(Vector3 a, Vector3 b, Color? color = null, bool dashed = false)
         {
-            Draw<Line>(color, dashed, a, b);
+            Draw<LineDrawer>(color, dashed, a, b);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Popcron
         /// <param name="color"></param>
         public static void Square(Vector2 position, Vector2 size, Color? color = null, bool dashed = false)
         {
-            Draw<Square>(color, dashed, position, Quaternion.identity, size);
+            Draw<SquareDrawer>(color, dashed, position, Quaternion.identity, size);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Popcron
         /// <param name="color"></param>
         public static void Square(Vector2 position, float diameter, Color? color = null, bool dashed = false)
         {
-            Draw<Square>(color, dashed, position, Quaternion.identity, Vector2.one * diameter * 0.5f);
+            Draw<SquareDrawer>(color, dashed, position, Quaternion.identity, Vector2.one * diameter * 0.5f);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Popcron
         /// <param name="color"></param>
         public static void Square(Vector2 position, Quaternion rotation, Vector2 size, Color? color = null, bool dashed = false)
         {
-            Draw<Square>(color, dashed, position, rotation, size);
+            Draw<SquareDrawer>(color, dashed, position, rotation, size);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace Popcron
         /// <param name="b"></param>
         public static void Cube(Vector3 position, Quaternion rotation, Vector3 size, Color? color = null, bool dashed = false)
         {
-            Draw<Cube>(color, dashed, position, rotation, size);
+            Draw<CubeDrawer>(color, dashed, position, rotation, size);
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace Popcron
         /// <param name="b"></param>
         public static void Sphere(Vector3 position, float radius, Color? color = null, bool dashed = false)
         {
-            Draw<Sphere>(color, dashed, position, radius);
+            Draw<SphereDrawer>(color, dashed, position, radius);
         }
     }
 }

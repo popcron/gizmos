@@ -2,7 +2,7 @@
 
 namespace Popcron
 {
-    public class Sphere : Drawer
+    public class SphereDrawer : Drawer
     {
         public override Vector3[] Draw(params object[] values)
         {
@@ -11,7 +11,7 @@ namespace Popcron
             Color color = (Color)values[2];
             Quaternion rotation = (Quaternion)values[2];
 
-            return Polygon.Draw(position, rotation, radius, 16, 0);
+            return PolygonDrawer.Draw(position, rotation, radius, 16, 0);
         }
     }
 }
