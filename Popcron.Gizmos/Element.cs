@@ -9,6 +9,7 @@ namespace Popcron
     {
         public Drawer drawer;
         public DrawInfo info;
+        public bool dashed;
 
         public Color Color
         {

@@ -42,12 +42,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Drawer.cs" />
     <Compile Include="Drawers\Circle.cs" />
     <Compile Include="Drawers\Cube.cs" />
-    <Compile Include="Drawer.cs" />
     <Compile Include="Drawers\Line.cs" />
     <Compile Include="Drawers\Polygon.cs" />
     <Compile Include="Drawers\Sphere.cs" />
+    <Compile Include="Drawers\Square.cs" />
     <Compile Include="DrawInfo.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="Gizmos.cs" />

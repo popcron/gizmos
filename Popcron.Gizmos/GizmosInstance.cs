@@ -115,8 +115,40 @@ namespace Popcron
             for (int e = 0; e < elements.Count; e++)
             {
                 GL.Color(elements[e].Color);
-                Vector3[] lines = elements[e].Draw();
-                for (int i = 0; i < lines.Length; i++)
+
+                List<Vector3> lines = new List<Vector3>();
+
+                Vector3[] elementLines = elements[e].Draw();
+                if (elements[e].dashed)
+                {
+                    //subdivide
+                    const float Interval = 2f;
+                    for (int i = 0; i < elementLines.Length; i++)
+                    {
+                        Vector3 pointA = elementLines[i];
+                        Vector3 pointB = elementLines[(i + 1) % elementLines.Length];
+
+                        int amount = Mathf.RoundToInt(Vector3.Distance(pointA, pointB) / Interval);
+                        Vector3 direction = (pointB - pointA).normalized;
+                        for (int a = 0; a < amount - 1; ++a)
+                        {
+                            if (a % 2 == 0)
+                            {
+                                float lerp = a / ((float)amount - 1);
+                                Vector3 start = Vector3.Lerp(pointA, pointB, lerp);
+                                Vector3 end = start + (direction * Interval);
+                                lines.Add(start);
+                                lines.Add(end);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    lines.AddRange(elementLines);
+                }
+
+                for (int i = 0; i < lines.Count; i++)
                 {
                     GL.Vertex(lines[i]);
                 }

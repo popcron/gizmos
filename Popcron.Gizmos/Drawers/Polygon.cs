@@ -20,23 +20,17 @@ namespace Popcron
             float angle = 360f / points;
             offset *= Mathf.Deg2Rad;
 
-            Vector3[] lines = new Vector3[2 * points];
-            for (int i = 0; i < points; i++)
+            Vector3[] lines = new Vector3[points + 1];
+            for (int i = 0; i < points + 1; i++)
             {
                 float sx = Mathf.Cos(Mathf.Deg2Rad * angle * i + offset) * radius * 0.5f;
                 float sy = Mathf.Sin(Mathf.Deg2Rad * angle * i + offset) * radius * 0.5f;
 
-                float nx = Mathf.Cos(Mathf.Deg2Rad * angle * (i + 1) + offset) * radius * 0.5f;
-                float ny = Mathf.Sin(Mathf.Deg2Rad * angle * (i + 1) + offset) * radius * 0.5f;
+                Vector3 point = new Vector3(sx, sy);
 
-                Vector3 a = new Vector3(sx, sy);
-                Vector3 b = new Vector3(nx, ny);
+                point = rotation * point;
 
-                a = rotation * a;
-                b = rotation * b;
-
-                lines[i * 2] = position + a;
-                lines[i * 2 + 1] = position + b;
+                lines[i] = position + point;
             }
 
             return lines;
