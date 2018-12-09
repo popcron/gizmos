@@ -4,10 +4,10 @@ namespace Popcron
 {
     public class Circle : Drawer
     {
-        public override Vector3[] Draw(DrawInfo drawInfo)
+        public override Vector3[] Draw(params object[] values)
         {
-            Vector3 position = drawInfo.vectors[0];
-            float radius = drawInfo.floats.Count > 0 ? drawInfo.floats[0] : 16f;
+            Vector2 position = (Vector2)values[0];
+            float radius = (float)values[1];
 
             return Polygon.Draw(position, Quaternion.identity, radius, 16, 0);
         }

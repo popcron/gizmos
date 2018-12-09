@@ -4,16 +4,16 @@ namespace Popcron
 {
     public class Square : Drawer
     {
-        public override Vector3[] Draw(DrawInfo drawInfo)
+        public override Vector3[] Draw(params object[] values)
         {
-            Vector2 position = drawInfo.vectors[0];
-            Vector2 size = drawInfo.vectors[1];
-            Quaternion rotation = drawInfo.rotation ?? Quaternion.identity;
+            Vector2 position = (Vector2)values[0];
+            Quaternion rotation = (Quaternion)values[1];
+            Vector2 size = (Vector2)values[2];
 
-            Vector2 point1 = new Vector3(position.x - size.x / 2f, position.y - size.y / 2f);
-            Vector2 point2 = new Vector3(position.x + size.x / 2f, position.y - size.y / 2f);
-            Vector2 point3 = new Vector3(position.x + size.x / 2f, position.y + size.y / 2f);
-            Vector2 point4 = new Vector3(position.x - size.x / 2f, position.y + size.y / 2f);
+            Vector2 point1 = new Vector3(position.x - size.x, position.y - size.y);
+            Vector2 point2 = new Vector3(position.x + size.x, position.y - size.y);
+            Vector2 point3 = new Vector3(position.x + size.x, position.y + size.y);
+            Vector2 point4 = new Vector3(position.x - size.x, position.y + size.y);
 
             point1 = rotation * (point1 - position);
             point1 += position;

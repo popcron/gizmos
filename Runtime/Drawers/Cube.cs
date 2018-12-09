@@ -4,21 +4,21 @@ namespace Popcron
 {
     public class Cube : Drawer
     {
-        public override Vector3[] Draw(DrawInfo drawInfo)
+        public override Vector3[] Draw(params object[] values)
         {
-            Vector3 position = drawInfo.vectors[0];
-            Vector3 size = drawInfo.vectors[1];
-            Quaternion rotation = drawInfo.rotation ?? Quaternion.identity;
+            Vector3 position = (Vector3)values[0];
+            Quaternion rotation = (Quaternion)values[1];
+            Vector3 size = (Vector3)values[2];
 
-            Vector3 point1 = new Vector3(position.x - size.x / 2f, position.y - size.y / 2f, position.z - size.z / 2f);
-            Vector3 point2 = new Vector3(position.x + size.x / 2f, position.y - size.y / 2f, position.z - size.z / 2f);
-            Vector3 point3 = new Vector3(position.x + size.x / 2f, position.y + size.y / 2f, position.z - size.z / 2f);
-            Vector3 point4 = new Vector3(position.x - size.x / 2f, position.y + size.y / 2f, position.z - size.z / 2f);
+            Vector3 point1 = new Vector3(position.x - size.x, position.y - size.y, position.z - size.z);
+            Vector3 point2 = new Vector3(position.x + size.x, position.y - size.y, position.z - size.z);
+            Vector3 point3 = new Vector3(position.x + size.x, position.y + size.y, position.z - size.z);
+            Vector3 point4 = new Vector3(position.x - size.x, position.y + size.y, position.z - size.z);
 
-            Vector3 point5 = new Vector3(position.x - size.x / 2f, position.y - size.y / 2f, position.z + size.z / 2f);
-            Vector3 point6 = new Vector3(position.x + size.x / 2f, position.y - size.y / 2f, position.z + size.z / 2f);
-            Vector3 point7 = new Vector3(position.x + size.x / 2f, position.y + size.y / 2f, position.z + size.z / 2f);
-            Vector3 point8 = new Vector3(position.x - size.x / 2f, position.y + size.y / 2f, position.z + size.z / 2f);
+            Vector3 point5 = new Vector3(position.x - size.x, position.y - size.y, position.z + size.z);
+            Vector3 point6 = new Vector3(position.x + size.x, position.y - size.y, position.z + size.z);
+            Vector3 point7 = new Vector3(position.x + size.x, position.y + size.y, position.z + size.z);
+            Vector3 point8 = new Vector3(position.x - size.x, position.y + size.y, position.z + size.z);
 
             point1 = rotation * (point1 - position);
             point1 += position;

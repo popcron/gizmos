@@ -4,12 +4,12 @@ namespace Popcron
 {
     public class Sphere : Drawer
     {
-        public override Vector3[] Draw(DrawInfo drawInfo)
+        public override Vector3[] Draw(params object[] values)
         {
-            Vector3 position = drawInfo.vectors[0];
-            float radius = drawInfo.floats.Count > 0 ? drawInfo.floats[0] : 16f;
-            Color color = drawInfo.color ?? Color.white;
-            Quaternion rotation = drawInfo.rotation ?? Camera.main.transform.rotation;
+            Vector3 position = (Vector3)values[0];
+            float radius = (float)values[1];
+            Color color = (Color)values[2];
+            Quaternion rotation = (Quaternion)values[2];
 
             return Polygon.Draw(position, rotation, radius, 16, 0);
         }

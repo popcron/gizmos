@@ -1,38 +1,50 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Popcron
 {
     public abstract class Drawer
     {
-        public abstract Vector3[] Draw(DrawInfo drawInfo);
+        private static Dictionary<Type, Drawer> typeToDrawer = null;
 
-        internal static T Create<T>() where T : class
+        public abstract Vector3[] Draw(params object[] args);
+
+        protected Drawer()
         {
-            if (typeof(T) == typeof(Line))
+
+        }
+
+        public static Drawer Get<T>() where T : class
+        {
+            //find all drawers
+            if (typeToDrawer == null)
             {
-                return new Line() as T;
+                typeToDrawer = new Dictionary<Type, Drawer>();
+
+                var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                foreach (var assembly in assemblies)
+                {
+                    var types = assembly.GetTypes();
+                    foreach (var type in types)
+                    {
+                        if (type.IsAbstract) continue;
+                        if (type.IsSubclassOf(typeof(Drawer)))
+                        {
+                            Drawer value = (Drawer)Activator.CreateInstance(type);
+                            typeToDrawer.Add(type, value);
+                        }
+                    }
+                }
             }
-            else if (typeof(T) == typeof(Cube))
+
+            if (typeToDrawer.TryGetValue(typeof(T), out Drawer drawer))
             {
-                return new Cube() as T;
-            }
-            else if (typeof(T) == typeof(Sphere))
-            {
-                return new Sphere() as T;
-            }
-            else if (typeof(T) == typeof(Circle))
-            {
-                return new Circle() as T;
-            }
-            else if (typeof(T) == typeof(Polygon))
-            {
-                return new Polygon() as T;
+                return drawer;
             }
             else
             {
-                T drawer = Activator.CreateInstance<T>();
-                return drawer as T;
+                return null;
             }
         }
     }

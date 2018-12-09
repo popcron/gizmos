@@ -4,12 +4,9 @@ namespace Popcron
 {
     public class Line : Drawer
     {
-        public override Vector3[] Draw(DrawInfo drawInfo)
+        public override Vector3[] Draw(params object[] args)
         {
-            Vector3 a = drawInfo.vectors[0];
-            Vector3 b = drawInfo.vectors[1];
-
-            return new Vector3[] { a, b };
+            return new Vector3[] { (Vector3)args[0], (Vector3)args[1] };
         }
     }
 }

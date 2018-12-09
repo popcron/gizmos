@@ -4,13 +4,13 @@ namespace Popcron
 {
     public class Polygon : Drawer
     {
-        public override Vector3[] Draw(DrawInfo drawInfo)
+        public override Vector3[] Draw(params object[] values)
         {
-            Vector3 position = drawInfo.vectors[0];
-            int points = (int)(drawInfo.floats.Count > 0 ? drawInfo.floats[0] : 16f);
-            float radius = drawInfo.floats.Count > 1 ? drawInfo.floats[1] : 16f;
-            float offset = drawInfo.floats.Count > 2 ? drawInfo.floats[2] : 0f;
-            Quaternion rotation = drawInfo.rotation ?? Camera.main.transform.rotation;
+            Vector3 position = (Vector3)values[0];
+            int points = (int)values[1];
+            float radius = (float)values[2];
+            float offset = (float)values[3];
+            Quaternion rotation = (Quaternion)values[3];
 
             return Draw(position, rotation, radius, points, offset);
         }
@@ -21,16 +21,17 @@ namespace Popcron
             offset *= Mathf.Deg2Rad;
 
             Vector3[] lines = new Vector3[points + 1];
-            for (int i = 0; i < points + 1; i++)
+            for (int i = 0; i < points; i++)
             {
-                float sx = Mathf.Cos(Mathf.Deg2Rad * angle * i + offset) * radius * 0.5f;
-                float sy = Mathf.Sin(Mathf.Deg2Rad * angle * i + offset) * radius * 0.5f;
+                float cx = Mathf.Cos(Mathf.Deg2Rad * angle * i + offset) * radius;
+                float cy = Mathf.Sin(Mathf.Deg2Rad * angle * i + offset) * radius;
+                Vector3 current = rotation * new Vector3(cx, cy);
 
-                Vector3 point = new Vector3(sx, sy);
+                //float nx = Mathf.Cos(Mathf.Deg2Rad * angle * (i + 1) + offset) * radius;
+                //float ny = Mathf.Sin(Mathf.Deg2Rad * angle * (i + 1) + offset) * radius;
+                //Vector3 next = rotation * new Vector3(nx, ny);
 
-                point = rotation * point;
-
-                lines[i] = position + point;
+                lines[i] = position + current;
             }
 
             return lines;

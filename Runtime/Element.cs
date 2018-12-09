@@ -5,27 +5,11 @@ using UnityEngine;
 namespace Popcron
 {
     [Serializable]
-    internal struct Element
+    internal class Element
     {
-        public Drawer drawer;
-        public DrawInfo info;
-        public bool dashed;
-
-        public Color Color
-        {
-            get
-            {
-                if (info == null) return Color.white;
-
-                return info.color ?? Color.white;
-            }
-        }
-
-        public Vector3[] Draw()
-        {
-            if (drawer == null) return null;
-
-            return drawer.Draw(info);
-        }
+        public bool active = false;
+        public Vector3[] points = { };
+        public Color color = Color.white;
+        public bool dashed = false;
     }
 }

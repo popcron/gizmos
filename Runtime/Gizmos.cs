@@ -1,10 +1,15 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Popcron
 {
     public class Gizmos
     {
         internal const string UniqueIdentifier = "Popcron.Gizmos";
+        internal const string EnabledKey = UniqueIdentifier + ".Enabled";
+
+        private static bool? enabled = null;
 
         /// <summary>
         /// Toggles wether the gizmos could be drawn or not
@@ -13,11 +18,20 @@ namespace Popcron
         {
             get
             {
-                return PlayerPrefs.GetInt(UniqueIdentifier + ".Enabled", 1) == 1;
+                if (enabled == null)
+                {
+                    enabled = PlayerPrefs.GetInt(UniqueIdentifier, 1) == 1;
+                }
+
+                return enabled.Value;
             }
             set
             {
-                PlayerPrefs.SetInt(UniqueIdentifier + ".Enabled", value ? 1 : 0);
+                if (enabled != value)
+                {
+                    enabled = value;
+                    PlayerPrefs.SetInt(UniqueIdentifier, value ? 1 : 0);
+                }
             }
         }
 
@@ -26,26 +40,15 @@ namespace Popcron
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="info"></param>
-        public static void Draw<T>(DrawInfo info, bool dashed) where T : class
+        public static void Draw<T>(Color? color = null, bool dashed = false, params object[] args) where T : Drawer
         {
             if (!Enabled) return;
 
-            if (typeof(T).IsSubclassOf(typeof(Drawer)))
+            Drawer drawer = Drawer.Get<T>();
+            if (drawer != null)
             {
-                GizmosInstance.CheckInstance();
-
-                Element item = new Element
-                {
-                    drawer = Drawer.Create<T>() as Drawer,
-                    info = info,
-                    dashed = dashed
-                };
-
-                GizmosInstance.elements.Add(item);
-            }
-            else
-            {
-                Debug.LogWarning(typeof(T) + "is not a Drawer");
+                Vector3[] points = drawer.Draw(args);
+                GizmosInstance.Add(points, color, dashed);
             }
         }
 
@@ -57,12 +60,7 @@ namespace Popcron
         /// <param name="color"></param>
         public static void Line(Vector3 a, Vector3 b, Color? color = null, bool dashed = false)
         {
-            DrawInfo info = new DrawInfo();
-            info.vectors.Add(a);
-            info.vectors.Add(b);
-            info.color = color;
-
-            Draw<Line>(info, dashed);
+            Draw<Line>(color, dashed, a, b);
         }
 
         /// <summary>
@@ -73,12 +71,18 @@ namespace Popcron
         /// <param name="color"></param>
         public static void Square(Vector2 position, Vector2 size, Color? color = null, bool dashed = false)
         {
-            DrawInfo info = new DrawInfo();
-            info.vectors.Add(position);
-            info.vectors.Add(size);
-            info.color = color;
+            Draw<Square>(color, dashed, position, Quaternion.identity, size);
+        }
 
-            Draw<Square>(info, dashed);
+        /// <summary>
+        /// Draw square in world space with float diameter parameter
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="color"></param>
+        public static void Square(Vector2 position, float diameter, Color? color = null, bool dashed = false)
+        {
+            Draw<Square>(color, dashed, position, Quaternion.identity, Vector2.one * diameter * 0.5f);
         }
 
         /// <summary>
@@ -89,15 +93,8 @@ namespace Popcron
         /// <param name="color"></param>
         public static void Square(Vector2 position, Quaternion rotation, Vector2 size, Color? color = null, bool dashed = false)
         {
-            DrawInfo info = new DrawInfo();
-            info.vectors.Add(position);
-            info.vectors.Add(size);
-            info.rotation = rotation;
-            info.color = color;
-
-            Draw<Square>(info, dashed);
+            Draw<Square>(color, dashed, position, rotation, size);
         }
-
 
         /// <summary>
         /// Draws a cube in world space
@@ -106,13 +103,7 @@ namespace Popcron
         /// <param name="b"></param>
         public static void Cube(Vector3 position, Quaternion rotation, Vector3 size, Color? color = null, bool dashed = false)
         {
-            DrawInfo info = new DrawInfo();
-            info.vectors.Add(position);
-            info.vectors.Add(size);
-            info.rotation = rotation;
-            info.color = color;
-
-            Draw<Cube>(info, dashed);
+            Draw<Cube>(color, dashed, position, rotation, size);
         }
 
         /// <summary>
@@ -122,13 +113,7 @@ namespace Popcron
         /// <param name="b"></param>
         public static void Sphere(Vector3 position, float radius, Color? color = null, bool dashed = false)
         {
-            DrawInfo info = new DrawInfo();
-            info.vectors.Add(position);
-            info.floats.Add(radius);
-            info.rotation = Camera.main?.transform?.rotation;
-            info.color = color;
-
-            Draw<Sphere>(info, dashed);
+            Draw<Sphere>(color, dashed, position, radius);
         }
     }
 }

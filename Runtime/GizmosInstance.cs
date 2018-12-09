@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Popcron
@@ -6,12 +7,15 @@ namespace Popcron
     [ExecuteInEditMode]
     public class GizmosInstance : MonoBehaviour
     {
+        private const int DefaultQueueSize = 128;
+
         private static GizmosInstance instance;
         private static bool hotReloaded = true;
         private static Material defaultMaterial;
-        private Material overrideMaterial;
 
-        internal static List<Element> elements = new List<Element>();
+        private Material overrideMaterial;
+        private int queueIndex = 0;
+        private Element[] queue = new Element[DefaultQueueSize];
 
         private static GizmosInstance Instance
         {
@@ -46,12 +50,6 @@ namespace Popcron
 
                 return instance;
             }
-        }
-
-        internal static void CheckInstance()
-        {
-            //dumb empty statement
-            if (Instance) ;
         }
 
         /// <summary>
@@ -104,59 +102,97 @@ namespace Popcron
             }
         }
 
-        private void OnRenderObject()
+        internal static void Add(Vector3[] points, Color? color = null, bool dashed = false)
         {
+            var instance = Instance;
+
+            //excedeed the length, so loopback
+            if (instance.queueIndex >= DefaultQueueSize)
+            {
+                instance.queueIndex = 0;
+            }
+            
+            instance.queue[instance.queueIndex].active = true;
+            instance.queue[instance.queueIndex].color = color ?? Color.white;
+            instance.queue[instance.queueIndex].points = points;
+            instance.queue[instance.queueIndex].dashed = dashed;
+
+            instance.queueIndex++;
+        }
+
+        private void OnEnable()
+        {
+            //populate queue with empty elements
+            queue = new Element[DefaultQueueSize];
+            for (int i = 0; i < DefaultQueueSize; i++)
+            {
+                queue[i] = new Element();
+            }
+
+            Camera.onPostRender += OnRendered;
+        }
+
+        private void OnDisable()
+        {
+            Camera.onPostRender -= OnRendered;
+        }
+
+        private void OnRendered(Camera camera)
+        {
+            //dont render if this camera isnt the main camera
+            if (!camera.CompareTag("MainCamera")) return;
+
             Material.SetPass(0);
 
             GL.PushMatrix();
             GL.Begin(GL.LINES);
 
             //draw elements
-            for (int e = 0; e < elements.Count; e++)
+            for (int e = 0; e < queue.Length; e++)
             {
-                GL.Color(elements[e].Color);
+                if (!queue[e].active) continue;
 
-                List<Vector3> lines = new List<Vector3>();
+                //set to inactive
+                queue[e].active = false;
 
-                Vector3[] elementLines = elements[e].Draw();
-                if (elements[e].dashed)
+                List<Vector3> points = new List<Vector3>();
+                if (queue[e].dashed)
                 {
                     //subdivide
                     const float Interval = 2f;
-                    for (int i = 0; i < elementLines.Length; i++)
+                    for (int i = 0; i < queue[e].points.Length; i++)
                     {
-                        Vector3 pointA = elementLines[i];
-                        Vector3 pointB = elementLines[(i + 1) % elementLines.Length];
-
+                        Vector3 pointA = queue[e].points[i];
+                        Vector3 pointB = queue[e].points[(i + 1) % queue[e].points.Length];
                         int amount = Mathf.RoundToInt(Vector3.Distance(pointA, pointB) / Interval);
                         Vector3 direction = (pointB - pointA).normalized;
-                        for (int a = 0; a < amount - 1; ++a)
+
+                        for (int p = 0; p < amount - 1; ++p)
                         {
-                            if (a % 2 == 0)
+                            if (p % 2 == 0)
                             {
-                                float lerp = a / ((float)amount - 1);
+                                float lerp = p / ((float)amount - 1);
                                 Vector3 start = Vector3.Lerp(pointA, pointB, lerp);
                                 Vector3 end = start + (direction * Interval);
-                                lines.Add(start);
-                                lines.Add(end);
+                                points.Add(start);
+                                points.Add(end);
                             }
                         }
                     }
                 }
                 else
                 {
-                    lines.AddRange(elementLines);
+                    points.AddRange(queue[e].points);
                 }
 
-                for (int i = 0; i < lines.Count; i++)
+                GL.Color(queue[e].color);
+
+                for (int i = 0; i < points.Count; i++)
                 {
-                    GL.Vertex(lines[i]);
+                    GL.Vertex(points[i]);
                 }
             }
-
-            //clear elemenets
-            elements.Clear();
-
+            
             GL.End();
             GL.PopMatrix();
         }
