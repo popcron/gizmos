@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Popcron
+namespace Popcron.Gizmos
 {
     public class SquareDrawer : Drawer
     {

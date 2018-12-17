@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Popcron
+namespace Popcron.Gizmos
 {
     public abstract class Drawer
     {

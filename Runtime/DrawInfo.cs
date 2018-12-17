@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace Popcron
+namespace Popcron.Gizmos
 {
     [Serializable]
     public class DrawInfo

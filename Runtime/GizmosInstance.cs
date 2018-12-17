@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Popcron
+namespace Popcron.Gizmos
 {
     [ExecuteInEditMode]
+    [AddComponentMenu("")]
     public class GizmosInstance : MonoBehaviour
     {
         private const int DefaultQueueSize = 128;
@@ -30,10 +31,10 @@ namespace Popcron
 
                 if (hotReloaded || forceCheck)
                 {
-                    GameObject gameObject = GameObject.Find(Gizmos.UniqueIdentifier + ".GameObject");
+                    GameObject gameObject = GameObject.Find(Constants.UniqueIdentifier + ".GameObject");
                     if (!gameObject)
                     {
-                        instance = new GameObject(Gizmos.UniqueIdentifier + ".GameObject").AddComponent<GizmosInstance>();
+                        instance = new GameObject(Constants.UniqueIdentifier + ".GameObject").AddComponent<GizmosInstance>();
                         instance.gameObject.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
                     }
                     else
@@ -148,6 +149,7 @@ namespace Popcron
             GL.Begin(GL.LINES);
 
             //draw elements
+            bool alt = (Time.time * 3) % 1 > 0.5f;
             for (int e = 0; e < queue.Length; e++)
             {
                 if (!queue[e].active) continue;
@@ -164,12 +166,14 @@ namespace Popcron
                     {
                         Vector3 pointA = queue[e].points[i];
                         Vector3 pointB = queue[e].points[(i + 1) % queue[e].points.Length];
-                        int amount = Mathf.RoundToInt(Vector3.Distance(pointA, pointB) / Interval);
-                        Vector3 direction = (pointB - pointA).normalized;
+                        Vector3 direction = pointB - pointA;
+                        float magnitude = direction.magnitude;
+                        int amount = Mathf.RoundToInt(magnitude / Interval);
+                        direction /= magnitude;
 
                         for (int p = 0; p < amount - 1; ++p)
                         {
-                            if (p % 2 == 0)
+                            if (p % 2 == (alt ? 0 : 1))
                             {
                                 float lerp = p / ((float)amount - 1);
                                 Vector3 start = Vector3.Lerp(pointA, pointB, lerp);
