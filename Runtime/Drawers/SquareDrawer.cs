@@ -27,16 +27,21 @@ namespace Popcron.Gizmos
             point4 = rotation * (point4 - position);
             point4 += position;
 
-            Vector3[] lines = new Vector3[5];
+            Vector3[] lines = new Vector3[8];
 
             //square
             lines[0] = point1;
             lines[1] = point2;
-            lines[2] = point3;
-            lines[3] = point4;
+
+            lines[2] = point2;
+            lines[3] = point3;
+
+            lines[4] = point3;
+            lines[5] = point4;
 
             //loop back to start
-            lines[4] = point1;
+            lines[6] = point4;
+            lines[7] = point1;
 
             return lines;
         }
