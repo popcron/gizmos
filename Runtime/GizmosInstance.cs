@@ -143,6 +143,7 @@ namespace Popcron.Gizmos
             //dont render if this camera isnt the main camera
             if (!camera.CompareTag("MainCamera")) return;
 
+            Vector3 offset = global::Gizmos.Offset;
             Material.SetPass(0);
 
             GL.PushMatrix();
@@ -190,10 +191,9 @@ namespace Popcron.Gizmos
                 }
 
                 GL.Color(queue[e].color);
-
                 for (int i = 0; i < points.Count; i++)
                 {
-                    GL.Vertex(points[i]);
+                    GL.Vertex(points[i] + offset);
                 }
             }
             
