@@ -8,7 +8,7 @@ namespace Popcron.Gizmos
     [AddComponentMenu("")]
     public class GizmosInstance : MonoBehaviour
     {
-        private const int DefaultQueueSize = 128;
+        private const int DefaultQueueSize = 512;
 
         private static GizmosInstance instance;
         private static bool hotReloaded = true;
