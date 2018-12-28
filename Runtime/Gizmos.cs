@@ -138,7 +138,7 @@ public class Gizmos
     /// <param name="b"></param>
     public static void Cube(Vector3 position, Quaternion rotation, Vector3 size, Color? color = null, bool dashed = false)
     {
-        Draw<CubeDrawer>(color, dashed, position, rotation, size);
+        Draw<CubeDrawer>(color, dashed, position, rotation, size * 0.5f);
     }
 
     /// <summary>
