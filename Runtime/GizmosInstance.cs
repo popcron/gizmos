@@ -112,7 +112,7 @@ namespace Popcron.Gizmos
             {
                 instance.queueIndex = 0;
             }
-            
+
             instance.queue[instance.queueIndex].active = true;
             instance.queue[instance.queueIndex].color = color ?? Color.white;
             instance.queue[instance.queueIndex].points = points;
@@ -141,7 +141,17 @@ namespace Popcron.Gizmos
         private void OnRendered(Camera camera)
         {
             //dont render if this camera isnt the main camera
-            if (!camera.CompareTag("MainCamera")) return;
+            bool allow = false;
+            if (camera.name == "SceneCamera")
+            {
+                allow = true;
+            }
+            if (camera.CompareTag("MainCamera"))
+            {
+                allow = true;
+            }
+
+            if (!allow) return;
 
             Vector3 offset = global::Gizmos.Offset;
             Material.SetPass(0);
@@ -196,7 +206,7 @@ namespace Popcron.Gizmos
                     GL.Vertex(points[i] + offset);
                 }
             }
-            
+
             GL.End();
             GL.PopMatrix();
         }
