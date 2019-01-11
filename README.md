@@ -3,12 +3,10 @@
 Used for drawing runtime gizmos in builds and editor from any context in the code.
 
 ## Requirements
-- .NET Framework 3.5
+- .NET Framework 4.5
 
 ## Installation
-1. Add the .dll file to the Plugins folder.
-2. Make sure that there is only one camera using the `MainCamera` tag.
-3. Draw a gizmos.
+To install for use in Unity, copy everything from this repository to `<YourUnityProject>/Packages/Popcron.Gizmos` folder.
 
 If using 2018.3.x, you can add a new entry to the manifest.json file in your Packages folder:
 ```json
@@ -47,11 +45,21 @@ public class GizmoDrawer : MonoBehaviour
 ## Custom drawers
 The ability to add custom drawers is possible. Inherit from the `Drawer` class and implement the `Draw` method. To see an example of drawing a line using a custom drawer, look at the `LineDrawer.cs` file.
 
-## Notes
-The package uses the same class name as the built-in gizmo class, if you'd like to specify the built-in one, explictly call `UntiyEngine.Gizmos.X()`. On the other hand, you can also point to this package's gizmo class with `global::Gizmos`. The reason why its named to same, is so that it's quicker to rewrite all the method calls, and to mimize the amount of used namespaces to declare at the top of the class file.
+## Built in drawers
+- Line
+- Cube = Can be used to draw squares too.
+- Circle = Can be used to draw spheres as well.
 
-The gizmos will only be processed on cameras with the `MainCamera` tag, this is to prevent gizmos drawing on multiple cameras, assuming there is only one main camera.
+## Notes
+The package uses the same class name as the built-in gizmo class, if you'd like to specify the built-in one, explictly call `UntiyEngine.Gizmos.X()`. On the other hand, you can also point to this package's gizmo class with `global::Gizmos`. The reason why its named the same, is so that it's quicker to rewrite all the method calls, and to mimize the amount of used namespaces to declare at the top of the class file.
+
+The gizmos will only be processed on the scene view camera, and the default MainCamera. To change this, you can specify using the static property for `Camera` in the `Gizmo` class:
+```cs
+//draw for this camera instead of using the MainCamera
+Gizmos.Camera = myCamera;
+```
 
 ## FAQ
 - **What namespace?** Popcron.Gizmos
 - **Does it work in builds?** Yes
+- **Is there frustum culling?** Yes
