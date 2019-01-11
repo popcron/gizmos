@@ -8,6 +8,7 @@ public class Gizmos
 {
     private static bool? enabled = null;
     private static Vector3? offset = null;
+    private static Camera camera = null;
 
     /// <summary>
     /// Toggles wether the gizmos could be drawn or not
@@ -30,6 +31,26 @@ public class Gizmos
                 enabled = value;
                 PlayerPrefs.SetInt(Application.buildGUID + Constants.UniqueIdentifier, value ? 1 : 0);
             }
+        }
+    }
+
+    /// <summary>
+    /// The camera to use when rendering, uses the MainCamera by default
+    /// </summary>
+    public static Camera Camera
+    {
+        get
+        {
+            if (camera == null)
+            {
+                camera = Camera.main;
+            }
+
+            return camera;
+        }
+        set
+        {
+            camera = value;
         }
     }
 
@@ -75,7 +96,7 @@ public class Gizmos
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="info"></param>
-    public static void Draw<T>(Color? color = null, bool dashed = false, params object[] args) where T : Drawer
+    public static void Draw<T>(Color? color, bool dashed, params object[] args) where T : Drawer
     {
         if (!Enabled) return;
 
@@ -83,6 +104,23 @@ public class Gizmos
         if (drawer != null)
         {
             Vector3[] points = drawer.Draw(args);
+
+            bool notVisible = true;
+            for (int i = 0; i < points.Length; i++)
+            {
+                Vector3 p = Camera.WorldToScreenPoint(points[i]);
+                if (p.x > 0 && p.y > 0 && p.x < Screen.width && p.y < Screen.height && p.z > 0)
+                {
+                    notVisible = false;
+                    break;
+                }
+            }
+
+            if (notVisible)
+            {
+                return;
+            }
+
             GizmosInstance.Add(points, color, dashed);
         }
     }
@@ -142,12 +180,27 @@ public class Gizmos
     }
 
     /// <summary>
-    /// Draws a sphere in world space
+    /// Draws a circle in world space with the main camera position
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
-    public static void Sphere(Vector3 position, float radius, Color? color = null, bool dashed = false)
+    public static void Circle(Vector3 position, float radius, Color? color = null, bool dashed = false)
     {
-        Draw<SphereDrawer>(color, dashed, position, radius);
+        int points = 16;
+        float offset = 0f;
+        Quaternion rotation = Camera.transform.rotation;
+        Draw<PolygonDrawer>(color, dashed, position, points, radius, offset, rotation);
+    }
+
+    /// <summary>
+    /// Draws a circle in world space with a specified rotation
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    public static void Circle(Vector3 position, float radius, Quaternion rotation, Color? color = null, bool dashed = false)
+    {
+        int points = 16;
+        float offset = 0f;
+        Draw<PolygonDrawer>(color, dashed, position, points, radius, offset, rotation);
     }
 }

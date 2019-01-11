@@ -103,7 +103,7 @@ namespace Popcron.Gizmos
             }
         }
 
-        internal static void Add(Vector3[] points, Color? color = null, bool dashed = false)
+        internal static void Add(Vector3[] points, Color? color, bool dashed)
         {
             var instance = Instance;
 
@@ -146,7 +146,7 @@ namespace Popcron.Gizmos
             {
                 allow = true;
             }
-            if (camera.CompareTag("MainCamera"))
+            if (camera == global::Gizmos.Camera)
             {
                 allow = true;
             }
