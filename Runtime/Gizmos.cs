@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +7,7 @@ using Popcron.Gizmos;
 public class Gizmos
 {
     private static bool? enabled = null;
+	private static bool? cull = null;
     private static Vector3? offset = null;
     private static Camera camera = null;
 
@@ -19,7 +20,7 @@ public class Gizmos
         {
             if (enabled == null)
             {
-                enabled = PlayerPrefs.GetInt(Application.buildGUID + Constants.UniqueIdentifier, 1) == 1;
+                enabled = PlayerPrefs.GetInt(Application.buildGUID + Constants.UniqueIdentifier + ".Enabled", 1) == 1;
             }
 
             return enabled.Value;
@@ -29,12 +30,12 @@ public class Gizmos
             if (enabled != value)
             {
                 enabled = value;
-                PlayerPrefs.SetInt(Application.buildGUID + Constants.UniqueIdentifier, value ? 1 : 0);
+                PlayerPrefs.SetInt(Application.buildGUID + Constants.UniqueIdentifier + ".Enabled", value ? 1 : 0);
             }
         }
     }
 
-    /// <summary>
+	/// <summary>
     /// The camera to use when rendering, uses the MainCamera by default
     /// </summary>
     public static Camera Camera
@@ -51,6 +52,30 @@ public class Gizmos
         set
         {
             camera = value;
+        }
+    }
+
+    /// <summary>
+    /// Should the camera not draw elements that are not visible?
+    /// </summary>
+    public static bool Cull
+    {
+        get
+        {
+            if (cull == null)
+            {
+                cull = PlayerPrefs.GetInt(Application.buildGUID + Constants.UniqueIdentifier + ".Cull", 1) == 1;
+            }
+
+            return cull.Value;
+        }
+        set
+        {
+            if (cull != value)
+            {
+                cull = value;
+                PlayerPrefs.SetInt(Application.buildGUID + Constants.UniqueIdentifier + ".Cull", value ? 1 : 0);
+            }
         }
     }
 
@@ -105,21 +130,24 @@ public class Gizmos
         {
             Vector3[] points = drawer.Draw(args);
 
-            bool notVisible = true;
-            for (int i = 0; i < points.Length; i++)
-            {
-                Vector3 p = Camera.WorldToScreenPoint(points[i]);
-                if (p.x > 0 && p.y > 0 && p.x < Screen.width && p.y < Screen.height && p.z > 0)
-                {
-                    notVisible = false;
-                    break;
-                }
-            }
+			if (Cull)
+			{
+				bool visible = false;
+				for (int i = 0; i < points.Length; i++)
+				{
+					Vector3 p = Camera.WorldToScreenPoint(points[i]);
+					if (p.x >= 0 && p.y >= 0 && p.x <= Screen.width && p.y <= Screen.height && p.z >= 0)
+					{
+						visible = true;
+						break;
+					}
+				}
 
-            if (notVisible)
-            {
-                return;
-            }
+				if (!visible)
+				{
+					return;
+				}
+			}
 
             GizmosInstance.Add(points, color, dashed);
         }
