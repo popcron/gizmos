@@ -4,6 +4,7 @@ Used for drawing runtime gizmos in builds and editor from any context in the cod
 
 ## Requirements
 - .NET Framework 4.5
+- Git
 
 ## Installation
 To install for use in Unity, copy everything from this repository to `<YourUnityProject>/Packages/Popcron.Gizmos` folder.
