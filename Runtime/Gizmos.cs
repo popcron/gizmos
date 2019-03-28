@@ -128,6 +128,7 @@ public class Gizmos
         Drawer drawer = Drawer.Get<T>();
         if (drawer != null)
         {
+            Camera currentCamera = GizmosInstance.currentCamera;
             Vector3[] points = drawer.Draw(args);
 
 			if (Cull)
@@ -135,7 +136,15 @@ public class Gizmos
 				bool visible = false;
 				for (int i = 0; i < points.Length; i++)
 				{
-					Vector3 p = Camera.WorldToScreenPoint(points[i]);
+                    //no current camera, assume its visible
+                    if (currentCamera == null)
+                    {
+                        visible = true;
+                        break;
+                    }
+
+                    //frustrum cull using the current camera
+                    Vector3 p = currentCamera.WorldToScreenPoint(points[i]);
 					if (p.x >= 0 && p.y >= 0 && p.x <= Screen.width && p.y <= Screen.height && p.z >= 0)
 					{
 						visible = true;
