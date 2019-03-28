@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,6 +13,7 @@ namespace Popcron.Gizmos
         private static GizmosInstance instance;
         private static bool hotReloaded = true;
         private static Material defaultMaterial;
+		internal static Camera currentCamera;
 
         private Material overrideMaterial;
         private int queueIndex = 0;
@@ -146,13 +147,14 @@ namespace Popcron.Gizmos
             {
                 allow = true;
             }
-            if (camera == global::Gizmos.Camera)
+            else if (camera == global::Gizmos.Camera)
             {
                 allow = true;
             }
 
             if (!allow) return;
 
+			currentCamera = camera;
             Vector3 offset = global::Gizmos.Offset;
             Material.SetPass(0);
 
