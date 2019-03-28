@@ -7,7 +7,7 @@ using Popcron.Gizmos;
 public class Gizmos
 {
     private static bool? enabled = null;
-	private static bool? cull = null;
+    private static bool? cull = null;
     private static Vector3? offset = null;
     private static Camera camera = null;
 
