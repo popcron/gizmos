@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,11 +23,11 @@ namespace Popcron.Gizmos
             {
                 typeToDrawer = new Dictionary<Type, Drawer>();
 
-                var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                foreach (var assembly in assemblies)
+                Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                foreach (Assembly assembly in assemblies)
                 {
-                    var types = assembly.GetTypes();
-                    foreach (var type in types)
+                    Type[] types = assembly.GetTypes();
+                    foreach (Type type in types)
                     {
                         if (type.IsAbstract) continue;
                         if (type.IsSubclassOf(typeof(Drawer)))
@@ -38,7 +39,8 @@ namespace Popcron.Gizmos
                 }
             }
 
-            if (typeToDrawer.TryGetValue(typeof(T), out Drawer drawer))
+            Drawer drawer;
+            if (typeToDrawer.TryGetValue(typeof(T), out drawer))
             {
                 return drawer;
             }
