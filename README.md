@@ -9,7 +9,7 @@ Used for drawing runtime gizmos in builds and editor from any context in the cod
 ## Installation
 To install for use in Unity, copy everything from this repository to `<YourUnityProject>/Packages/Popcron.Gizmos` folder.
 
-If using 2018.3.x, you can add a new entry to the manifest.json file in your Packages folder:
+If using 2018.3.x or higher, you can add a new entry to the manifest.json file in your Packages folder:
 ```json
 "com.popcron.gizmos": "https://github.com/popcron/gizmos.git"
 ```
