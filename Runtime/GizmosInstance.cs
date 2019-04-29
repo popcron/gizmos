@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Popcron.Gizmos
+namespace Popcron
 {
     [ExecuteInEditMode]
     [AddComponentMenu("")]
@@ -147,7 +147,7 @@ namespace Popcron.Gizmos
             {
                 allow = true;
             }
-            else if (camera == global::Gizmos.Camera)
+            else if (camera == Gizmos.Camera)
             {
                 allow = true;
             }
@@ -155,7 +155,7 @@ namespace Popcron.Gizmos
             if (!allow) return;
 
 			currentCamera = camera;
-            Vector3 offset = global::Gizmos.Offset;
+            Vector3 offset = Gizmos.Offset;
             Material.SetPass(0);
 
             GL.PushMatrix();
