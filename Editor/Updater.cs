@@ -21,6 +21,17 @@ public class Updater : Editor
             int end = start + text.Substring(start).IndexOf("}") + 2;
             string entry = text.Substring(start, end - start);
 
+            //doesnt end with a comma, so remove the comma at the beginning of this entry if it exists because its the last entry
+            if (!entry.EndsWith(","))
+            {
+                if (text.Substring(start - 2).Contains(","))
+                {
+                    //4 spaces for tabs and 3 for quote, comma and }
+                    int comma = (start - 7) + text.Substring(start - 7).IndexOf(",");
+                    text = text.Remove(comma, 1);
+                }
+            }
+
             text = text.Replace(entry, "");
             File.WriteAllText(path, text);
 
