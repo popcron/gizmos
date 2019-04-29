@@ -27,7 +27,7 @@ public class GizmoDrawer : MonoBehaviour
         //use custom material, if null it uses a default line material
         Gizmos.Material = material;
         
-        //toggle gizmo drawing using the same key as in minecwaft
+        //toggle gizmo drawing using the same key as in minecraft
         if (Input.GetKeyDown(KeyCode.F3))
         {
             Gizmos.Enabled = !Gizmos.Enabled;
@@ -52,7 +52,7 @@ The ability to add custom drawers is possible. Inherit from the `Drawer` class a
 - Circle = Can be used to draw spheres as well.
 
 ## Notes
-The package uses the same class name as the built-in gizmo class, if you'd like to specify the built-in one, explictly call `UntiyEngine.Gizmos.X()`. On the other hand, you can also point to this package's gizmo class with `global::Gizmos`. The reason why its named the same, is so that it's quicker to rewrite all the method calls, and to mimize the amount of used namespaces to declare at the top of the class file.
+The package uses the same class name as the built-in gizmo class, if you'd like to specify the built-in one, explictly call `UnityEngine.Gizmos.X()`. On the other hand, you can also point to this package's gizmo class with `global::Gizmos`. The reason why its named the same, is so that it's quicker to rewrite all the method calls, and to mimize the amount of used namespaces to declare at the top of the class file.
 
 The gizmos will only be processed on the scene view camera, and the default MainCamera. To change this, you can specify using the static property for `Camera` in the `Gizmo` class:
 ```cs
