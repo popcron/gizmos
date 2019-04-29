@@ -18,12 +18,12 @@ namespace Popcron
             Vector3[] lines = new Vector3[points * 2];
             for (int i = 0; i < points; i++)
             {
-                float cx = Mathf.Cos(Mathf.Deg2Rad * step * i + offset) * radius * 0.5f;
-                float cy = Mathf.Sin(Mathf.Deg2Rad * step * i + offset) * radius * 0.5f;
+                float cx = Mathf.Cos(Mathf.Deg2Rad * step * i + offset) * radius;
+                float cy = Mathf.Sin(Mathf.Deg2Rad * step * i + offset) * radius;
                 Vector3 current = new Vector3(cx, cy);
 
-                float nx = Mathf.Cos(Mathf.Deg2Rad * step * (i + 1) + offset) * radius * 0.5f;
-                float ny = Mathf.Sin(Mathf.Deg2Rad * step * (i + 1) + offset) * radius * 0.5f;
+                float nx = Mathf.Cos(Mathf.Deg2Rad * step * (i + 1) + offset) * radius;
+                float ny = Mathf.Sin(Mathf.Deg2Rad * step * (i + 1) + offset) * radius;
                 Vector3 next = new Vector3(nx, ny);
 
                 lines[i * 2] = position + (rotation * current);
