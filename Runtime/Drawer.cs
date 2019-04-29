@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Popcron.Gizmos
+namespace Popcron
 {
     public abstract class Drawer
     {

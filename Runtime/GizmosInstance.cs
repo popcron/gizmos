@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Popcron.Gizmos
+namespace Popcron
 {
     [ExecuteInEditMode]
     [AddComponentMenu("")]

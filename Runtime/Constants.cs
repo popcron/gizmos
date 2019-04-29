@@ -1,4 +1,4 @@
-﻿namespace Popcron.Gizmos
+﻿namespace Popcron
 {
     public class Constants
     {

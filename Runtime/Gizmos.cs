@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-using Popcron.Gizmos;
-
-namespace Popcron.Gizmos
+namespace Popcron
 {
     public class Gizmos
     {

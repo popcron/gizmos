@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Popcron.Gizmos
+namespace Popcron
 {
     public class LineDrawer : Drawer
     {
