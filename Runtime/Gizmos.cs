@@ -4,7 +4,7 @@ using UnityEngine;
 
 using Popcron.Gizmos;
 
-namespace Popcron
+namespace Popcron.Gizmos
 {
     public class Gizmos
     {
