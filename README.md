@@ -17,7 +17,7 @@ If using 2018.3.x or higher, you can add a new entry to the manifest.json file i
 ## Example
 ```cs
 using UnityEngine;
-using Gizmos = Popcorn.Gizmos;
+using Gizmos = Popcron.Gizmos;
 
 public class GizmoDrawer : MonoBehaviour
 {
