@@ -78,6 +78,21 @@ namespace Popcron
                 }
             }
         }
+        
+        /// <summary>
+        /// The material being used to render
+        /// </summary>
+        public static Material Material
+        {
+            get
+            {
+                return GizmosInstance.Material;   
+            }
+            set   
+            {
+                GizmosInstance.Material = value;   
+            }
+        }
 
         /// <summary>
         /// Global offset for all points. Default is (0, 0, 0)
