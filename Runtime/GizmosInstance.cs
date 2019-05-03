@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Popcron
 {
@@ -131,12 +132,31 @@ namespace Popcron
                 queue[i] = new Element();
             }
 
-            Camera.onPostRender += OnRendered;
+            if (GraphicsSettings.renderPipelineAsset == null)
+            {
+                Camera.onPostRender += OnRendered;
+            }
+            else
+            {
+                RenderPipelineManager.endCameraRendering += OnRendered;
+            }
         }
 
         private void OnDisable()
         {
-            Camera.onPostRender -= OnRendered;
+            if (GraphicsSettings.renderPipelineAsset == null)
+            {
+                Camera.onPostRender -= OnRendered;
+            }
+            else
+            {
+                RenderPipelineManager.endCameraRendering -= OnRendered;
+            }
+        }
+
+        private void OnRendered(ScriptableRenderContext context, Camera camera)
+        {
+            OnRendered(camera);
         }
 
         private void OnRendered(Camera camera)
