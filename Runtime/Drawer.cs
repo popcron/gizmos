@@ -9,7 +9,7 @@ namespace Popcron
     {
         private static Dictionary<Type, Drawer> typeToDrawer = null;
 
-        public abstract Vector3[] Draw(params object[] args);
+        public abstract int Draw(ref Vector3[] buffer, params object[] args);
 
         protected Drawer()
         {

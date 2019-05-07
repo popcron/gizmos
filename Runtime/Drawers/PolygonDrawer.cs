@@ -4,7 +4,7 @@ namespace Popcron
 {
     public class PolygonDrawer : Drawer
     {
-        public override Vector3[] Draw(params object[] values)
+        public override int Draw(ref Vector3[] buffer, params object[] values)
         {
             Vector3 position = (Vector3)values[0];
             int points = (int)values[1];
@@ -15,7 +15,6 @@ namespace Popcron
             float step = 360f / points;
             offset *= Mathf.Deg2Rad;
 
-            Vector3[] lines = new Vector3[points * 2];
             for (int i = 0; i < points; i++)
             {
                 float cx = Mathf.Cos(Mathf.Deg2Rad * step * i + offset) * radius;
@@ -26,11 +25,11 @@ namespace Popcron
                 float ny = Mathf.Sin(Mathf.Deg2Rad * step * (i + 1) + offset) * radius;
                 Vector3 next = new Vector3(nx, ny);
 
-                lines[i * 2] = position + (rotation * current);
-                lines[(i * 2) + 1] = position + (rotation * next);
+                buffer[i * 2] = position + (rotation * current);
+                buffer[(i * 2) + 1] = position + (rotation * next);
             }
 
-            return lines;
+            return points * 2;
         }
     }
 }

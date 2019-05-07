@@ -1,5 +1,5 @@
 {
-    "name": "Popcron.Gizmos",
+    "name": "Popcron.Gizmos.Editor",
     "references": [],
     "optionalUnityReferences": [],
     "includePlatforms": [

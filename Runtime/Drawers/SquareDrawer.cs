@@ -4,7 +4,7 @@ namespace Popcron
 {
     public class SquareDrawer : Drawer
     {
-        public override Vector3[] Draw(params object[] values)
+        public override int Draw(ref Vector3[] buffer, params object[] values)
         {
             Vector2 position = (Vector2)values[0];
             Quaternion rotation = (Quaternion)values[1];
@@ -27,23 +27,21 @@ namespace Popcron
             point4 = rotation * (point4 - position);
             point4 += position;
 
-            Vector3[] lines = new Vector3[8];
-
             //square
-            lines[0] = point1;
-            lines[1] = point2;
+            buffer[0] = point1;
+            buffer[1] = point2;
 
-            lines[2] = point2;
-            lines[3] = point3;
+            buffer[2] = point2;
+            buffer[3] = point3;
 
-            lines[4] = point3;
-            lines[5] = point4;
+            buffer[4] = point3;
+            buffer[5] = point4;
 
             //loop back to start
-            lines[6] = point4;
-            lines[7] = point1;
+            buffer[6] = point4;
+            buffer[7] = point1;
 
-            return lines;
+            return 8;
         }
     }
 }

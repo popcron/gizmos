@@ -10,6 +10,7 @@ namespace Popcron
         private static bool? cull = null;
         private static Vector3? offset = null;
         private static Camera camera = null;
+        private static Vector3[] buffer = new Vector3[1024];
 
         /// <summary>
         /// Toggles wether the gizmos could be drawn or not
@@ -144,12 +145,13 @@ namespace Popcron
             if (drawer != null)
             {
                 Camera currentCamera = GizmosInstance.currentCamera;
-                Vector3[] points = drawer.Draw(args);
+                int points = drawer.Draw(ref buffer, args);
 
+                //use frustum culling
                 if (Cull)
                 {
                     bool visible = false;
-                    for (int i = 0; i < points.Length; i++)
+                    for (int i = 0; i < points; i++)
                     {
                         //no current camera, assume its visible
                         if (currentCamera == null)
@@ -159,7 +161,7 @@ namespace Popcron
                         }
 
                         //frustrum cull using the current camera
-                        Vector3 p = currentCamera.WorldToScreenPoint(points[i]);
+                        Vector3 p = currentCamera.WorldToScreenPoint(buffer[i]);
                         if (p.x >= 0 && p.y >= 0 && p.x <= Screen.width && p.y <= Screen.height && p.z >= 0)
                         {
                             visible = true;
@@ -173,7 +175,10 @@ namespace Popcron
                     }
                 }
 
-                GizmosInstance.Add(points, color, dashed);
+                //copy from buffer and add to the queue
+                Vector3[] array = new Vector3[points];
+                Array.Copy(buffer, array, points);
+                GizmosInstance.Add(array, color, dashed);
             }
         }
 

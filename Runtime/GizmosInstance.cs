@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -93,10 +92,10 @@ namespace Popcron
                     };
 
                     // Turn on alpha blending
-                    defaultMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-                    defaultMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                    defaultMaterial.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+                    defaultMaterial.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
                     // Turn backface culling off
-                    defaultMaterial.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
+                    defaultMaterial.SetInt("_Cull", (int)CullMode.Off);
                     // Turn off depth writes
                     defaultMaterial.SetInt("_ZWrite", 0);
                 }
@@ -107,7 +106,7 @@ namespace Popcron
 
         internal static void Add(Vector3[] points, Color? color, bool dashed)
         {
-            var instance = Instance;
+            GizmosInstance instance = Instance;
 
             //excedeed the length, so loopback
             if (instance.queueIndex >= DefaultQueueSize)

@@ -1,5 +1,5 @@
 {
-    "name": "Popcron.Gizmos.Runtime",
+    "name": "Popcron.Gizmos",
     "references": [],
     "optionalUnityReferences": [],
     "includePlatforms": [],
@@ -8,5 +8,6 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": []
+    "defineConstraints": [],
+    "versionDefines": []
 }

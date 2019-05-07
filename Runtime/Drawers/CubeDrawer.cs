@@ -4,7 +4,7 @@ namespace Popcron
 {
     public class CubeDrawer : Drawer
     {
-        public override Vector3[] Draw(params object[] values)
+        public override int Draw(ref Vector3[] buffer, params object[] values)
         {
             Vector3 position = (Vector3)values[0];
             Quaternion rotation = (Quaternion)values[1];
@@ -44,48 +44,46 @@ namespace Popcron
             point8 = rotation * (point8 - position);
             point8 += position;
 
-            Vector3[] lines = new Vector3[4 * 3 * 2];
-
             //square
-            lines[0] = point1;
-            lines[1] = point2;
+            buffer[0] = point1;
+            buffer[1] = point2;
 
-            lines[2] = point2;
-            lines[3] = point3;
+            buffer[2] = point2;
+            buffer[3] = point3;
 
-            lines[4] = point3;
-            lines[5] = point4;
+            buffer[4] = point3;
+            buffer[5] = point4;
 
-            lines[6] = point4;
-            lines[7] = point1;
+            buffer[6] = point4;
+            buffer[7] = point1;
 
             //other square
-            lines[8] = point5;
-            lines[9] = point6;
+            buffer[8] = point5;
+            buffer[9] = point6;
 
-            lines[10] = point6;
-            lines[11] = point7;
+            buffer[10] = point6;
+            buffer[11] = point7;
 
-            lines[12] = point7;
-            lines[13] = point8;
+            buffer[12] = point7;
+            buffer[13] = point8;
 
-            lines[14] = point8;
-            lines[15] = point5;
+            buffer[14] = point8;
+            buffer[15] = point5;
 
-            //connector
-            lines[16] = point1;
-            lines[17] = point5;
+            //connectors
+            buffer[16] = point1;
+            buffer[17] = point5;
 
-            lines[18] = point2;
-            lines[19] = point6;
+            buffer[18] = point2;
+            buffer[19] = point6;
 
-            lines[20] = point3;
-            lines[21] = point7;
+            buffer[20] = point3;
+            buffer[21] = point7;
 
-            lines[22] = point4;
-            lines[23] = point8;
+            buffer[22] = point4;
+            buffer[23] = point8;
 
-            return lines;
+            return 24;
         }
     }
 }
