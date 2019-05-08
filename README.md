@@ -61,6 +61,8 @@ The gizmos will only be processed on the scene view camera, and the default Main
 Gizmos.Camera = myCamera;
 ```
 
+The alternative is to make a global class with the same name that redirects all of its calls to Popcron.Gizmos. The downside to this is that you will need to be explicit when calling the UnityEngine.Gizmos class. Choose your poison.
+
 ## FAQ
 - **What namespace?** 'Popcron'
 - **Does it work in builds?** Yes
