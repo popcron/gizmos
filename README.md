@@ -1,4 +1,4 @@
-![Ah, gl lines](https://img.itch.zone/aW1nLzkwOTgxMy5wbmc=/original/rb1Vfm.png)
+![Ah, gl lines](https://cdn.discordapp.com/attachments/377316629220032523/576127655712391198/unknown.png)
 # Gizmos
 Used for drawing runtime gizmos in builds and editor from any context in the code.
 
