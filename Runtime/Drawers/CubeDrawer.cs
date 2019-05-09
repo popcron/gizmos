@@ -10,6 +10,8 @@ namespace Popcron
             Quaternion rotation = (Quaternion)values[1];
             Vector3 size = (Vector3)values[2];
 
+            size *= 0.5f;
+
             Vector3 point1 = new Vector3(position.x - size.x, position.y - size.y, position.z - size.z);
             Vector3 point2 = new Vector3(position.x + size.x, position.y - size.y, position.z - size.z);
             Vector3 point3 = new Vector3(position.x + size.x, position.y + size.y, position.z - size.z);
