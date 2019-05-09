@@ -45,6 +45,9 @@ public class GizmoDrawer : MonoBehaviour
         {
             Gizmos.Enabled = !Gizmos.Enabled;
         }
+        
+        //can also draw from update
+        Gizmos.Cone(transform.position, transform.rotation, 15f, 45f, Color.green);
     }
 }
 ```
