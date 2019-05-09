@@ -52,6 +52,8 @@ public class GizmoDrawer : MonoBehaviour
 ## Custom drawers
 The ability to add custom drawers is possible. Inherit from the `Drawer` class and implement the `Draw` method. To see an example of drawing a line using a custom drawer, look at the `LineDrawer.cs` file.
 
+The `Draw` method takes in a ref parameter to a Vector3 array as the buffer, and then a params array of objects. The method expects to return the number of points allocated to the buffer. For example, if renderering a single line, allocate the two points at buffer[0] and buffer[1], and return 2. If the number returned is not the same as the amount of points actually used, then the end result of the drawn element will look incorrect and corrupt.
+
 ## API
 - `Gizmos.Line` = Draws a line from point a to b. Equivalent to Gizmos.DrawLine
 - `Gizmos.Square` = Draws a 2D square in the XY plane
@@ -62,7 +64,7 @@ The ability to add custom drawers is possible. Inherit from the `Drawer` class a
 - `Gizmos.Circle` = Draws a 2D circle that is oriented to the camera by default
 
 ## Notes
-The package uses the same class name as the built-in gizmo class, because of this, you will need to use an alias to point to the right class ('using Gizmos = Popcron.Gizmos').
+The package uses the same class name as the built-in gizmo class, because of this, you will need to use an alias to point to the right class (`using Gizmos = Popcron.Gizmos`).
 
 The gizmos will only be processed on the scene view camera, and the default MainCamera. To change this, you can specify using the static property for `Camera` in the `Gizmo` class:
 ```cs
