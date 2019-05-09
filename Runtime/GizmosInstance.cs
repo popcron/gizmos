@@ -1,6 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
+
+#if UNITY_EDITOR
+using UnityEditor.SceneManagement;
+#endif
 
 namespace Popcron
 {
@@ -13,7 +18,7 @@ namespace Popcron
         private static GizmosInstance instance;
         private static bool hotReloaded = true;
         private static Material defaultMaterial;
-		internal static Camera currentCamera;
+        internal static Camera currentCamera;
 
         private Material overrideMaterial;
         private int queueIndex = 0;
@@ -24,7 +29,6 @@ namespace Popcron
             get
             {
                 bool forceCheck = false;
-
                 if (!Application.isPlaying)
                 {
                     forceCheck = !instance;
@@ -32,20 +36,44 @@ namespace Popcron
 
                 if (hotReloaded || forceCheck)
                 {
-                    GameObject gameObject = GameObject.Find(Constants.UniqueIdentifier + ".GameObject");
-                    if (!gameObject)
+                    bool markDirty = false;
+                    GizmosInstance[] gizmosInstances = FindObjectsOfType<GizmosInstance>();
+                    for (int i = 0; i < gizmosInstances.Length; i++)
                     {
-                        instance = new GameObject(Constants.UniqueIdentifier + ".GameObject").AddComponent<GizmosInstance>();
-                        instance.gameObject.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
-                    }
-                    else
-                    {
-                        instance = gameObject.GetComponent<GizmosInstance>();
-                        if (!instance)
+                        instance = gizmosInstances[i];
+
+                        //destroy any extra gizmo instances
+                        if (i > 0)
                         {
-                            instance = gameObject.AddComponent<GizmosInstance>();
+                            if (Application.isPlaying)
+                            {
+                                Destroy(gizmosInstances[i]);
+                            }
+                            else
+                            {
+                                DestroyImmediate(gizmosInstances[i]);
+                                markDirty = true;
+                            }
                         }
                     }
+
+                    //none were found, create a new one
+                    if (!instance)
+                    {
+                        instance = new GameObject("Popcron.Gizmos.GizmosInstance").AddComponent<GizmosInstance>();
+                        instance.gameObject.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+
+                        markDirty = true;
+                    }
+
+#if UNITY_EDITOR
+                    //mark scene as dirty
+                    if (markDirty && !Application.isPlaying)
+                    {
+                        Scene scene = SceneManager.GetActiveScene();
+                        EditorSceneManager.MarkSceneDirty(scene);
+                    }
+#endif
 
                     hotReloaded = false;
                 }
@@ -94,9 +122,7 @@ namespace Popcron
                     // Turn on alpha blending
                     defaultMaterial.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
                     defaultMaterial.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
-                    // Turn backface culling off
                     defaultMaterial.SetInt("_Cull", (int)CullMode.Off);
-                    // Turn off depth writes
                     defaultMaterial.SetInt("_ZWrite", 0);
                 }
 
@@ -173,7 +199,7 @@ namespace Popcron
 
             if (!allow) return;
 
-			currentCamera = camera;
+            currentCamera = camera;
             Vector3 offset = Gizmos.Offset;
             Material.SetPass(0);
 
@@ -181,7 +207,20 @@ namespace Popcron
             GL.Begin(GL.LINES);
 
             //draw elements
-            bool alt = (Time.time * 3) % 1 > 0.5f;
+            float time = 0f;
+            if (Application.isPlaying)
+            {
+                time = Time.time;
+            }
+            else
+            {
+#if UNITY_EDITOR
+                time = (float)UnityEditor.EditorApplication.timeSinceStartup;
+#endif
+            }
+
+            bool alt = time % 1 > 0.5f;
+            float dashGap = Mathf.Clamp(Gizmos.DashGap, 0.01f, 32f);
             for (int e = 0; e < queue.Length; e++)
             {
                 if (!queue[e].active) continue;
@@ -193,26 +232,34 @@ namespace Popcron
                 if (queue[e].dashed)
                 {
                     //subdivide
-                    const float Interval = 2f;
-                    for (int i = 0; i < queue[e].points.Length; i++)
+                    for (int i = 0; i < queue[e].points.Length - 1; i++)
                     {
                         Vector3 pointA = queue[e].points[i];
-                        Vector3 pointB = queue[e].points[(i + 1) % queue[e].points.Length];
+                        Vector3 pointB = queue[e].points[i + 1];
                         Vector3 direction = pointB - pointA;
                         float magnitude = direction.magnitude;
-                        int amount = Mathf.RoundToInt(magnitude / Interval);
-                        direction /= magnitude;
-
-                        for (int p = 0; p < amount - 1; ++p)
+                        if (magnitude > dashGap * 2f)
                         {
-                            if (p % 2 == (alt ? 0 : 1))
+                            int amount = Mathf.RoundToInt(magnitude / dashGap);
+                            direction /= magnitude;
+
+                            for (int p = 0; p < amount - 1; p++)
                             {
-                                float lerp = p / ((float)amount - 1);
-                                Vector3 start = Vector3.Lerp(pointA, pointB, lerp);
-                                Vector3 end = start + (direction * Interval);
-                                points.Add(start);
-                                points.Add(end);
+                                if (p % 2 == (alt ? 1 : 0))
+                                {
+                                    float startLerp = p / ((float)amount - 1);
+                                    float endLerp = (p + 1) / ((float)amount - 1);
+                                    Vector3 start = Vector3.Lerp(pointA, pointB, startLerp);
+                                    Vector3 end = Vector3.Lerp(pointA, pointB, endLerp);
+                                    points.Add(start);
+                                    points.Add(end);
+                                }
                             }
+                        }
+                        else
+                        {
+                            points.Add(pointA);
+                            points.Add(pointB);
                         }
                     }
                 }
