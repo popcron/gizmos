@@ -135,8 +135,6 @@ namespace Popcron
         /// <summary>
         /// Draws an element onto the screen
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="info"></param>
         public static void Draw<T>(Color? color, bool dashed, params object[] args) where T : Drawer
         {
             if (!Enabled) return;
@@ -185,9 +183,6 @@ namespace Popcron
         /// <summary>
         /// Draw line in world space
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <param name="color"></param>
         public static void Line(Vector3 a, Vector3 b, Color? color = null, bool dashed = false)
         {
             Draw<LineDrawer>(color, dashed, a, b);
@@ -196,31 +191,22 @@ namespace Popcron
         /// <summary>
         /// Draw square in world space
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <param name="color"></param>
         public static void Square(Vector2 position, Vector2 size, Color? color = null, bool dashed = false)
         {
-            Draw<SquareDrawer>(color, dashed, position, Quaternion.identity, size * 0.5f);
+            Square(position, Quaternion.identity, size, color, dashed);
         }
 
         /// <summary>
         /// Draw square in world space with float diameter parameter
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <param name="color"></param>
         public static void Square(Vector2 position, float diameter, Color? color = null, bool dashed = false)
         {
-            Draw<SquareDrawer>(color, dashed, position, Quaternion.identity, Vector2.one * diameter * 0.5f);
+            Square(position, Quaternion.identity, Vector2.one * diameter, color, dashed);
         }
 
         /// <summary>
         /// Draw square in world space with a rotation parameter
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <param name="color"></param>
         public static void Square(Vector2 position, Quaternion rotation, Vector2 size, Color? color = null, bool dashed = false)
         {
             Draw<SquareDrawer>(color, dashed, position, rotation, size * 0.5f);
@@ -229,8 +215,6 @@ namespace Popcron
         /// <summary>
         /// Draws a cube in world space
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
         public static void Cube(Vector3 position, Quaternion rotation, Vector3 size, Color? color = null, bool dashed = false)
         {
             Draw<CubeDrawer>(color, dashed, position, rotation, size * 0.5f);
@@ -239,21 +223,15 @@ namespace Popcron
         /// <summary>
         /// Draws a circle in world space with the main camera position
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
         public static void Circle(Vector3 position, float radius, Color? color = null, bool dashed = false)
         {
-            int points = 16;
-            float offset = 0f;
             Quaternion rotation = Camera.transform.rotation;
-            Draw<PolygonDrawer>(color, dashed, position, points, radius, offset, rotation);
+            Circle(position, radius, rotation, color, dashed);
         }
 
         /// <summary>
         /// Draws a circle in world space with a specified rotation
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
         public static void Circle(Vector3 position, float radius, Quaternion rotation, Color? color = null, bool dashed = false)
         {
             int points = 16;
