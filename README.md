@@ -52,10 +52,14 @@ public class GizmoDrawer : MonoBehaviour
 ## Custom drawers
 The ability to add custom drawers is possible. Inherit from the `Drawer` class and implement the `Draw` method. To see an example of drawing a line using a custom drawer, look at the `LineDrawer.cs` file.
 
-## Built in drawers
-- Line
-- Cube = Can be used to draw squares too.
-- Circle = Can be used to draw spheres as well.
+## API
+- `Gizmos.Line` = Draws a line from point a to b. Equivalent to Gizmos.DrawLine
+- `Gizmos.Square` = Draws a 2D square in the XY plane
+- `Gizmos.Cube` = Draws a 3D cube in world space with orientation and scale parameters. Equivalent to Gizmos.DrawWireCube
+- `Gizmos.Bounds` = Draws a representation of a Bounds object
+- `Gizmos.Cone` = Draws a cone with specified orientation, length and angle
+- `Gizmos.Sphere` = Draws a 3D sphere. Equivalent to Gizmos.DrawWireSphere
+- `Gizmos.Circle` = Draws a 2D circle that is oriented to the camera by default
 
 ## Notes
 The package uses the same class name as the built-in gizmo class, because of this, you will need to use an alias to point to the right class ('using Gizmos = Popcron.Gizmos').
