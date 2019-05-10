@@ -58,12 +58,12 @@ The ability to add custom drawers is possible. Inherit from the `Drawer` class a
 The `Draw` method takes in a ref parameter to a Vector3 array as the buffer, and then a params array of objects. The method expects to return the number of points allocated to the buffer. For example, if renderering a single line, allocate the two points at buffer[0] and buffer[1], and return 2. If the number returned is not the same as the amount of points actually used, then the end result of the drawn element will look incorrect and corrupt.
 
 ## API
-- `Gizmos.Line` = Draws a line from point a to b. Equivalent to Gizmos.DrawLine
+- `Gizmos.Line` = Draws a line from point a to b. Equivalent to [Gizmos.DrawLine](https://docs.unity3d.com/ScriptReference/Gizmos.DrawLine.html)
 - `Gizmos.Square` = Draws a 2D square in the XY plane
-- `Gizmos.Cube` = Draws a 3D cube in world space with orientation and scale parameters. Equivalent to Gizmos.DrawWireCube
+- `Gizmos.Cube` = Draws a 3D cube in world space with orientation and scale parameters. Equivalent to [Gizmos.DrawWireCube](https://docs.unity3d.com/ScriptReference/Gizmos.DrawWireCube.html)
 - `Gizmos.Bounds` = Draws a representation of a Bounds object
 - `Gizmos.Cone` = Draws a cone with specified orientation, length and angle
-- `Gizmos.Sphere` = Draws a 3D sphere. Equivalent to Gizmos.DrawWireSphere
+- `Gizmos.Sphere` = Draws a 3D sphere. Equivalent to [Gizmos.DrawWireSphere](https://docs.unity3d.com/ScriptReference/Gizmos.DrawWireSphere.html)
 - `Gizmos.Circle` = Draws a 2D circle that is oriented to the camera by default
 
 ## Notes
