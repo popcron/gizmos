@@ -173,7 +173,7 @@ namespace Popcron
 
         private static int GetPolygonPoints(Vector3 position, float radius)
         {
-            Camera currentCamera = GizmosInstance.currentCamera;
+            Camera currentCamera = GizmosInstance.currentRenderingCamera;
             if (currentCamera != null)
             {
                 float distance = Vector3.Distance(position, currentCamera.transform.position);
@@ -198,14 +198,14 @@ namespace Popcron
             Drawer drawer = Drawer.Get<T>();
             if (drawer != null)
             {
-                Camera currentCamera = GizmosInstance.currentCamera;
+                Camera camera = GizmosInstance.currentRenderingCamera;
                 int points = drawer.Draw(ref buffer, args);
 
                 //use frustum culling
                 if (FrustumCulling)
                 {
                     bool visible = false;
-                    if (currentCamera != null)
+                    if (camera != null)
                     {
                         //calculate the bounds of this element
                         Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
@@ -224,7 +224,7 @@ namespace Popcron
                         Bounds bounds = new Bounds();
                         bounds.SetMinMax(min, max);
 
-                        GeometryUtility.CalculateFrustumPlanes(currentCamera, cameraPlanes);
+                        GeometryUtility.CalculateFrustumPlanes(camera, cameraPlanes);
                         if (GeometryUtility.TestPlanesAABB(cameraPlanes, bounds))
                         {
                             visible = true;
@@ -241,6 +241,9 @@ namespace Popcron
                         return;
                     }
                 }
+
+                //blindly call this in order to ensure that one exists
+                GizmosInstance.GetOrCreate();
 
                 //copy from buffer and add to the queue
                 Vector3[] array = new Vector3[points];
@@ -343,7 +346,7 @@ namespace Popcron
         /// </summary>
         public static void Circle(Vector3 position, float radius, Color? color = null, bool dashed = false)
         {
-            Camera currentCamera = GizmosInstance.currentCamera;
+            Camera currentCamera = GizmosInstance.currentRenderingCamera;
             Quaternion rotation = Quaternion.identity;
             if (currentCamera != null)
             {

@@ -18,69 +18,11 @@ namespace Popcron
         private static GizmosInstance instance;
         private static bool hotReloaded = true;
         private static Material defaultMaterial;
-        internal static Camera currentCamera;
+        internal static Camera currentRenderingCamera;
 
         private Material overrideMaterial;
         private int queueIndex = 0;
         private Element[] queue = new Element[DefaultQueueSize];
-
-        private static GizmosInstance Instance
-        {
-            get
-            {
-                bool forceCheck = false;
-                if (!Application.isPlaying)
-                {
-                    forceCheck = !instance;
-                }
-
-                if (hotReloaded || forceCheck)
-                {
-                    bool markDirty = false;
-                    GizmosInstance[] gizmosInstances = FindObjectsOfType<GizmosInstance>();
-                    for (int i = 0; i < gizmosInstances.Length; i++)
-                    {
-                        instance = gizmosInstances[i];
-
-                        //destroy any extra gizmo instances
-                        if (i > 0)
-                        {
-                            if (Application.isPlaying)
-                            {
-                                Destroy(gizmosInstances[i]);
-                            }
-                            else
-                            {
-                                DestroyImmediate(gizmosInstances[i]);
-                                markDirty = true;
-                            }
-                        }
-                    }
-
-                    //none were found, create a new one
-                    if (!instance)
-                    {
-                        instance = new GameObject("Popcron.Gizmos.GizmosInstance").AddComponent<GizmosInstance>();
-                        instance.gameObject.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
-
-                        markDirty = true;
-                    }
-
-#if UNITY_EDITOR
-                    //mark scene as dirty
-                    if (markDirty && !Application.isPlaying)
-                    {
-                        Scene scene = SceneManager.GetActiveScene();
-                        EditorSceneManager.MarkSceneDirty(scene);
-                    }
-#endif
-
-                    hotReloaded = false;
-                }
-
-                return instance;
-            }
-        }
 
         /// <summary>
         /// The material being used to render
@@ -89,16 +31,18 @@ namespace Popcron
         {
             get
             {
-                if (Instance.overrideMaterial)
+                GizmosInstance inst = GetOrCreate();
+                if (inst.overrideMaterial)
                 {
-                    return Instance.overrideMaterial;
+                    return inst.overrideMaterial;
                 }
 
                 return DefaultMaterial;
             }
             set
             {
-                Instance.overrideMaterial = value;
+                GizmosInstance inst = GetOrCreate();
+                inst.overrideMaterial = value;
             }
         }
 
@@ -130,22 +74,71 @@ namespace Popcron
             }
         }
 
-        internal static void Add(Vector3[] points, Color? color, bool dashed)
+        internal static GizmosInstance GetOrCreate()
         {
-            GizmosInstance instance = Instance;
-
-            //excedeed the length, so loopback
-            if (instance.queueIndex >= DefaultQueueSize)
+            if (hotReloaded || !instance)
             {
-                instance.queueIndex = 0;
+                bool markDirty = false;
+                GizmosInstance[] gizmosInstances = FindObjectsOfType<GizmosInstance>();
+                for (int i = 0; i < gizmosInstances.Length; i++)
+                {
+                    instance = gizmosInstances[i];
+
+                    //destroy any extra gizmo instances
+                    if (i > 0)
+                    {
+                        if (Application.isPlaying)
+                        {
+                            Destroy(gizmosInstances[i]);
+                        }
+                        else
+                        {
+                            DestroyImmediate(gizmosInstances[i]);
+                            markDirty = true;
+                        }
+                    }
+                }
+
+                //none were found, create a new one
+                if (!instance)
+                {
+                    instance = new GameObject("Popcron.Gizmos.GizmosInstance").AddComponent<GizmosInstance>();
+                    instance.gameObject.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+
+                    markDirty = true;
+                }
+
+#if UNITY_EDITOR
+                //mark scene as dirty
+                if (markDirty && !Application.isPlaying)
+                {
+                    Scene scene = SceneManager.GetActiveScene();
+                    EditorSceneManager.MarkSceneDirty(scene);
+                }
+#endif
+
+                hotReloaded = false;
             }
 
-            instance.queue[instance.queueIndex].active = true;
-            instance.queue[instance.queueIndex].color = color ?? Color.white;
-            instance.queue[instance.queueIndex].points = points;
-            instance.queue[instance.queueIndex].dashed = dashed;
+            return instance;
+        }
 
-            instance.queueIndex++;
+        internal static void Add(Vector3[] points, Color? color, bool dashed)
+        {
+            GizmosInstance inst = GetOrCreate();
+
+            //excedeed the length, so loopback
+            if (inst.queueIndex >= DefaultQueueSize)
+            {
+                inst.queueIndex = 0;
+            }
+
+            inst.queue[inst.queueIndex].active = true;
+            inst.queue[inst.queueIndex].color = color ?? Color.white;
+            inst.queue[inst.queueIndex].points = points;
+            inst.queue[inst.queueIndex].dashed = dashed;
+
+            inst.queueIndex++;
         }
 
         private void OnEnable()
@@ -199,7 +192,7 @@ namespace Popcron
 
             if (!allow) return;
 
-            currentCamera = camera;
+            currentRenderingCamera = camera;
             Vector3 offset = Gizmos.Offset;
             Material.SetPass(0);
 
