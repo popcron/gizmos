@@ -242,9 +242,6 @@ namespace Popcron
                     }
                 }
 
-                //blindly call this in order to ensure that one exists
-                GizmosInstance.GetOrCreate();
-
                 //copy from buffer and add to the queue
                 Vector3[] array = new Vector3[points];
                 Array.Copy(buffer, array, points);
@@ -293,13 +290,32 @@ namespace Popcron
         }
 
         /// <summary>
+        /// Draws a rectangle in screen space
+        /// </summary>
+        public static void Rect(Rect rect, Color? color = null, bool dashed = false)
+        {
+            Camera camera = GizmosInstance.currentRenderingCamera;
+            if (camera == null)
+            {
+                camera = Camera;
+            }
+
+            rect.y = Screen.height - rect.y;
+            Vector2 corner = camera.ScreenToWorldPoint(new Vector2(rect.x, rect.y - rect.height));
+            Draw<SquareDrawer>(color, dashed, corner + rect.size * 0.5f, Quaternion.identity, rect.size);
+        }
+
+        /// <summary>
         /// Draws a representation of a bounding box
         /// </summary>
         public static void Bounds(Bounds bounds, Color? color = null, bool dashed = false)
         {
-            Cube(bounds.center, Quaternion.identity, bounds.size, color, dashed);
+            Draw<CubeDrawer>(color, dashed, bounds.center, Quaternion.identity, bounds.size);
         }
 
+        /// <summary>
+        /// Draws a cone similar to the one that spot lights draw
+        /// </summary>
         public static void Cone(Vector3 position, Quaternion rotation, float length, float angle, Color? color = null, bool dashed = false)
         {
             //draw the end of the cone

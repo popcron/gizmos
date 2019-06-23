@@ -6,9 +6,27 @@ namespace Popcron
     {
         public override int Draw(ref Vector3[] buffer, params object[] values)
         {
-            Vector2 position = (Vector2)values[0];
+            Vector2 position = default;
+            if (values[0] is Vector2 p2)
+            {
+                position = p2;
+            }
+            else if (values[0] is Vector3 p3)
+            {
+                position = p3;
+            }
+
             Quaternion rotation = (Quaternion)values[1];
-            Vector2 size = (Vector2)values[2];
+
+            Vector2 size = default;
+            if (values[2] is Vector2 s2)
+            {
+                size = s2;
+            }
+            else if (values[2] is Vector3 s3)
+            {
+                size = s3;
+            }
 
             size *= 0.5f;
 
