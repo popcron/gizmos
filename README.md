@@ -77,6 +77,8 @@ Gizmos.Camera = myCamera;
 
 The alternative is to make a global class with the same name that redirects all of its calls to Popcron.Gizmos. The downside to this is that you will need to be explicit when calling the UnityEngine.Gizmos class. Choose your poison.
 
+When using the legacy pipeline in a project without the Scriptable Rendering Pipeline package installed, you need to set the `UNITY_LEGACY_PIPELINE` preprocessor directive in the Project Settings > Player > Scripting Define Symbols.
+
 ## FAQ
 - **What namespace?** 'Popcron'
 - **Does it work in builds?** Yes
