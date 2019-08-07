@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEditor.SceneManagement;
 #endif
 
-#if UNITY_LEGACY_PIPELINE
+#if UNITY_2018_4
 using System;
 
 public struct ScriptableRenderContext {}
