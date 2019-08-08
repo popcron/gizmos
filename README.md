@@ -1,6 +1,7 @@
 ![Ah, gl lines](https://cdn.discordapp.com/attachments/377316629220032523/576127655712391198/unknown.png)
 # Gizmos
 Used for drawing runtime gizmos in builds and editor from any context in the code.
+*Note: Currently doesn't work if a render pipline asset is set in the graphics settings of the project*
 
 ## Requirements
 - .NET Framework 4.5
