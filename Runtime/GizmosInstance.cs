@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEditor.SceneManagement;
 #endif
 
-#if UNITY_2018_4
+#if !UNITY_2019_1_OR_NEWER
 using System;
 
 public struct ScriptableRenderContext {}
