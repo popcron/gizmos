@@ -2,7 +2,7 @@
 # Gizmos
 Used for drawing runtime gizmos in builds and editor from any context in the code.
 
-*Note: Currently doesn't work if a render pipline asset is set in the graphics settings of the project*
+*Note: Currently doesn't work if a render pipline asset is set in the graphics settings of the project in SRP if the version is below 7.1.1*
 
 ## Requirements
 - .NET Framework 4.5
