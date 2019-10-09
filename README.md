@@ -83,3 +83,4 @@ The alternative is to make a global class with the same name that redirects all 
 - **What namespace?** 'Popcron'
 - **Does it work in builds?** Yes
 - **Is there frustum culling?** Yes
+- **It's not rendering in game!** Check if your gizmo code is in OnDrawGizmos, this method isnt called in builds.
