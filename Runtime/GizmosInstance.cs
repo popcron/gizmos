@@ -191,18 +191,18 @@ namespace Popcron
 
         private void OnRendered(Camera camera)
         {
-            //dont render if this camera isnt the main camera
-            bool allow = false;
-            if (camera.name == "SceneCamera")
-            {
-                allow = true;
-            }
-            else if (camera == Gizmos.Camera)
-            {
-                allow = true;
-            }
-
-            if (!allow) return;
+//            //dont render if this camera isnt the main camera
+//            bool allow = false;
+//            if (camera.name == "SceneCamera")
+//            {
+//                allow = true;
+//            }
+//            else if (camera == Gizmos.Camera)
+//            {
+//                allow = true;
+//            }
+//
+//            if (!allow) return;
 
             currentRenderingCamera = camera;
             Vector3 offset = Gizmos.Offset;
