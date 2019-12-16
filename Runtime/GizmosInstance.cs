@@ -31,7 +31,6 @@ namespace Popcron
         private static GizmosInstance instance;
         private static bool hotReloaded = true;
         private static Material defaultMaterial;
-        internal static Camera currentRenderingCamera;
 
         private Material overrideMaterial;
         private int queueIndex = 0;
@@ -194,7 +193,6 @@ namespace Popcron
             // Disallow gizmo rendering to cameras that not fits to predicate
             if(camera.name != "SceneCamera" && !Gizmos.CameraPredicate.Invoke(camera)) return;
 
-            currentRenderingCamera = camera;
             Vector3 offset = Gizmos.Offset;
             Material.SetPass(0);
 
