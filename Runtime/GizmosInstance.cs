@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -188,21 +189,10 @@ namespace Popcron
         {
             OnRendered(camera);
         }
-
-        private void OnRendered(Camera camera)
-        {
-//            //dont render if this camera isnt the main camera
-//            bool allow = false;
-//            if (camera.name == "SceneCamera")
-//            {
-//                allow = true;
-//            }
-//            else if (camera == Gizmos.Camera)
-//            {
-//                allow = true;
-//            }
-//
-//            if (!allow) return;
+        
+        private void OnRendered(Camera camera){
+            // Disallow gizmo rendering to cameras that not fits to predicate
+            if(camera.name != "SceneCamera" && !Gizmos.CameraPredicate.Invoke(camera)) return;
 
             currentRenderingCamera = camera;
             Vector3 offset = Gizmos.Offset;

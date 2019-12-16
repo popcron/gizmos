@@ -111,6 +111,8 @@ namespace Popcron
             }
         }
 
+        public static Func<Camera, bool> CameraPredicate = cam => false;
+
         [Obsolete("This property is obsolete. Use FrustumCulling instead.", false)]
         public static bool Cull
         {
