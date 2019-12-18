@@ -12,7 +12,6 @@ namespace Popcron
         private static Vector3? _offset = null;
         private static Camera _camera = null;
 
-        private static Plane[] cameraPlanes = new Plane[6];
         private static Vector3[] buffer = new Vector3[BufferSize];
 
         public static Func<Camera, bool> CameraFilter = cam => false;
@@ -187,7 +186,10 @@ namespace Popcron
         /// </summary>
         public static void Draw<T>(Color? color, bool dashed, params object[] args) where T : Drawer
         {
-            if (!Enabled) return;
+            if (!Enabled)
+            {
+                return;
+            }
 
             Drawer drawer = Drawer.Get<T>();
             if (drawer != null)
