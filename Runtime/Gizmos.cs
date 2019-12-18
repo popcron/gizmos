@@ -304,6 +304,16 @@ namespace Popcron
         }
 
         /// <summary>
+        /// Draws a circle in world space and billboards towards the camera.
+        /// </summary>
+        public static void Circle(Vector3 position, float radius, Camera camera, Color? color = null, bool dashed = false, int pointsCount = 16)
+        {
+            float offset = 0f;
+            Quaternion rotation = Quaternion.LookRotation(position - camera.transform.position);
+            Draw<PolygonDrawer>(color, dashed, position, pointsCount, radius, offset, rotation);
+        }
+
+        /// <summary>
         /// Draws a circle in world space with a specified rotation.
         /// </summary>
         public static void Circle(Vector3 position, float radius, Quaternion rotation, Color? color = null, bool dashed = false, int pointsCount = 16)
