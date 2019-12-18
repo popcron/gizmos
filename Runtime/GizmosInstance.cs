@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -30,7 +31,7 @@ namespace Popcron
         private static GizmosInstance instance;
         private static bool hotReloaded = true;
         private static Material defaultMaterial;
-        internal static Camera currentRenderingCamera;
+        private static Plane[] cameraPlanes = new Plane[6];
 
         private Material overrideMaterial;
         private int queueIndex = 0;
@@ -189,22 +190,55 @@ namespace Popcron
             OnRendered(camera);
         }
 
+        private bool ShouldRenderCamera(Camera camera)
+        {
+            if (!camera)
+            {
+                return false;
+            }
+
+            //allow the scene and main camera always
+            if (camera.name == "SceneCamera" || camera.CompareTag("MainCamera"))
+            {
+                return true;
+            }
+
+            //it passed through the filter
+            if (Gizmos.CameraFilter?.Invoke(camera) == true)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsVisibleByCamera(Element points, Camera camera)
+        {
+            if (!camera)
+            {
+                return false;
+            }
+
+            //essentially check if at least 1 point is visible by the camera
+            for (int i = 0; i < points.points.Length; i++)
+            {
+                Vector3 vp = camera.WorldToViewportPoint(points.points[i], camera.stereoActiveEye);
+                if (vp.x >= 0 && vp.x <= 1 && vp.y >= 0 && vp.y <= 1)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void OnRendered(Camera camera)
         {
-            //dont render if this camera isnt the main camera
-            bool allow = false;
-            if (camera.name == "SceneCamera")
+            if (!ShouldRenderCamera(camera))
             {
-                allow = true;
-            }
-            else if (camera == Gizmos.Camera)
-            {
-                allow = true;
+                return;
             }
 
-            if (!allow) return;
-
-            currentRenderingCamera = camera;
             Vector3 offset = Gizmos.Offset;
             Material.SetPass(0);
 
@@ -226,25 +260,37 @@ namespace Popcron
 
             bool alt = time % 1 > 0.5f;
             float dashGap = Mathf.Clamp(Gizmos.DashGap, 0.01f, 32f);
+            List<Vector3> points = new List<Vector3>();
             for (int e = 0; e < queue.Length; e++)
             {
-                if (!queue[e].active) continue;
+                Element element = queue[e];
+                if (!element.active)
+                {
+                    continue;
+                }
+                element.active = false;
 
-                //set to inactive
-                queue[e].active = false;
+                //dont render this thingy if its not inside the frustum
+                if (Gizmos.FrustumCulling)
+                {
+                    if (!IsVisibleByCamera(element, camera))
+                    {
+                        continue;
+                    }
+                }
 
-                List<Vector3> points = new List<Vector3>();
-                if (queue[e].dashed)
+                points.Clear();
+                if (element.dashed)
                 {
                     //subdivide
-                    for (int i = 0; i < queue[e].points.Length - 1; i++)
+                    for (int i = 0; i < element.points.Length - 1; i++)
                     {
-                        Vector3 pointA = queue[e].points[i];
-                        Vector3 pointB = queue[e].points[i + 1];
+                        Vector3 pointA = element.points[i];
+                        Vector3 pointB = element.points[i + 1];
                         Vector3 direction = pointB - pointA;
-                        float magnitude = direction.magnitude;
-                        if (magnitude > dashGap * 2f)
+                        if (direction.sqrMagnitude > dashGap * dashGap * 2f)
                         {
+                            float magnitude = direction.magnitude;
                             int amount = Mathf.RoundToInt(magnitude / dashGap);
                             direction /= magnitude;
 
@@ -252,8 +298,8 @@ namespace Popcron
                             {
                                 if (p % 2 == (alt ? 1 : 0))
                                 {
-                                    float startLerp = p / ((float)amount - 1);
-                                    float endLerp = (p + 1) / ((float)amount - 1);
+                                    float startLerp = p / (amount - 1f);
+                                    float endLerp = (p + 1) / (amount - 1f);
                                     Vector3 start = Vector3.Lerp(pointA, pointB, startLerp);
                                     Vector3 end = Vector3.Lerp(pointA, pointB, endLerp);
                                     points.Add(start);
@@ -270,10 +316,10 @@ namespace Popcron
                 }
                 else
                 {
-                    points.AddRange(queue[e].points);
+                    points.AddRange(element.points);
                 }
 
-                GL.Color(queue[e].color);
+                GL.Color(element.color);
                 for (int i = 0; i < points.Count; i++)
                 {
                     GL.Vertex(points[i] + offset);

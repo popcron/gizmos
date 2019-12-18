@@ -12,8 +12,9 @@ namespace Popcron
         private static Vector3? _offset = null;
         private static Camera _camera = null;
 
-        private static Plane[] cameraPlanes = new Plane[6];
         private static Vector3[] buffer = new Vector3[BufferSize];
+
+        public static Func<Camera, bool> CameraFilter = cam => false;
 
         /// <summary>
         /// The size of the total gizmos buffer.
@@ -91,26 +92,6 @@ namespace Popcron
             }
         }
 
-        /// <summary>
-        /// The camera to use when rendering, uses the MainCamera by default.
-        /// </summary>
-        public static Camera Camera
-        {
-            get
-            {
-                if (_camera == null)
-                {
-                    _camera = Camera.main;
-                }
-
-                return _camera;
-            }
-            set
-            {
-                _camera = value;
-            }
-        }
-
         [Obsolete("This property is obsolete. Use FrustumCulling instead.", false)]
         public static bool Cull
         {
@@ -121,6 +102,16 @@ namespace Popcron
             set
             {
                 FrustumCulling = value;
+            }
+        }
+
+        [Obsolete("This property is obsolete. Subscribe to CameraFilter predicate instead and return true for your custom camera.", false)]
+        public static Camera Camera
+        {
+            get => null;
+            set
+            {
+
             }
         }
 
@@ -200,76 +191,20 @@ namespace Popcron
             }
         }
 
-        private static int GetPolygonPoints(Vector3 position, float radius)
-        {
-            Camera currentCamera = GizmosInstance.currentRenderingCamera;
-            if (currentCamera != null)
-            {
-                float distance = Vector3.Distance(position, currentCamera.transform.position);
-                distance /= radius;
-
-                int points = (int)(Mathf.Atan(16f / distance) * Mathf.Rad2Deg);
-                if (points > 42) points = 42;
-                if (points < 6) points = 6;
-                return points;
-            }
-
-            return 16;
-        }
-
         /// <summary>
         /// Draws an element onto the screen.
         /// </summary>
         public static void Draw<T>(Color? color, bool dashed, params object[] args) where T : Drawer
         {
-            if (!Enabled) return;
+            if (!Enabled)
+            {
+                return;
+            }
 
             Drawer drawer = Drawer.Get<T>();
             if (drawer != null)
             {
-                Camera camera = GizmosInstance.currentRenderingCamera;
                 int points = drawer.Draw(ref buffer, args);
-
-                //use frustum culling
-                if (FrustumCulling)
-                {
-                    bool visible = false;
-                    if (camera != null)
-                    {
-                        //calculate the bounds of this element
-                        Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-                        Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
-                        for (int i = 0; i < points; i++)
-                        {
-                            Vector3 p = buffer[i];
-                            if (p.x > max.x) max.x = p.x;
-                            if (p.y > max.y) max.y = p.y;
-                            if (p.z > max.z) max.z = p.z;
-                            if (p.x < min.x) min.x = p.x;
-                            if (p.y < min.y) min.y = p.y;
-                            if (p.z < min.z) min.z = p.z;
-                        }
-
-                        Bounds bounds = new Bounds();
-                        bounds.SetMinMax(min, max);
-
-                        GeometryUtility.CalculateFrustumPlanes(camera, cameraPlanes);
-                        if (GeometryUtility.TestPlanesAABB(cameraPlanes, bounds))
-                        {
-                            visible = true;
-                        }
-                    }
-                    else
-                    {
-                        //no current camera, assume its visible
-                        visible = true;
-                    }
-
-                    if (!visible)
-                    {
-                        return;
-                    }
-                }
 
                 //copy from buffer and add to the queue
                 Vector3[] array = new Vector3[points];
@@ -321,14 +256,8 @@ namespace Popcron
         /// <summary>
         /// Draws a rectangle in screen space.
         /// </summary>
-        public static void Rect(Rect rect, Color? color = null, bool dashed = false)
+        public static void Rect(Rect rect, Camera camera, Color? color = null, bool dashed = false)
         {
-            Camera camera = GizmosInstance.currentRenderingCamera;
-            if (camera == null)
-            {
-                camera = Camera;
-            }
-
             rect.y = Screen.height - rect.y;
             Vector2 corner = camera.ScreenToWorldPoint(new Vector2(rect.x, rect.y - rect.height));
             Draw<SquareDrawer>(color, dashed, corner + rect.size * 0.5f, Quaternion.identity, rect.size);
@@ -345,15 +274,14 @@ namespace Popcron
         /// <summary>
         /// Draws a cone similar to the one that spot lights draw.
         /// </summary>
-        public static void Cone(Vector3 position, Quaternion rotation, float length, float angle, Color? color = null, bool dashed = false)
+        public static void Cone(Vector3 position, Quaternion rotation, float length, float angle, Color? color = null, bool dashed = false, int pointsCount = 16)
         {
             //draw the end of the cone
             float endAngle = Mathf.Tan(angle * 0.5f * Mathf.Deg2Rad) * length;
             Vector3 forward = rotation * Vector3.forward;
             Vector3 endPosition = position + forward * length;
-            int points = GetPolygonPoints(position, endAngle);
             float offset = 0f;
-            Draw<PolygonDrawer>(color, dashed, endPosition, points, endAngle, offset, rotation);
+            Draw<PolygonDrawer>(color, dashed, endPosition, pointsCount, endAngle, offset, rotation);
 
             //draw the 4 lines
             for (int i = 0; i < 4; i++)
@@ -367,38 +295,21 @@ namespace Popcron
         /// <summary>
         /// Draws a sphere at position with specified radius.
         /// </summary>
-        public static void Sphere(Vector3 position, float radius, Color? color = null, bool dashed = false)
+        public static void Sphere(Vector3 position, float radius, Color? color = null, bool dashed = false, int pointsCount = 16)
         {
-            int points = GetPolygonPoints(position, radius);
             float offset = 0f;
-            Draw<PolygonDrawer>(color, dashed, position, points, radius, offset, Quaternion.Euler(0f, 0f, 0f));
-            Draw<PolygonDrawer>(color, dashed, position, points, radius, offset, Quaternion.Euler(90f, 0f, 0f));
-            Draw<PolygonDrawer>(color, dashed, position, points, radius, offset, Quaternion.Euler(0f, 90f, 90f));
+            Draw<PolygonDrawer>(color, dashed, position, pointsCount, radius, offset, Quaternion.Euler(0f, 0f, 0f));
+            Draw<PolygonDrawer>(color, dashed, position, pointsCount, radius, offset, Quaternion.Euler(90f, 0f, 0f));
+            Draw<PolygonDrawer>(color, dashed, position, pointsCount, radius, offset, Quaternion.Euler(0f, 90f, 90f));
         }
 
         /// <summary>
         /// Draws a circle in world space with a specified rotation.
         /// </summary>
-        public static void Circle(Vector3 position, float radius, Quaternion rotation, Color? color = null, bool dashed = false)
+        public static void Circle(Vector3 position, float radius, Quaternion rotation, Color? color = null, bool dashed = false, int pointsCount = 16)
         {
-            int points = GetPolygonPoints(position, radius);
             float offset = 0f;
-            Draw<PolygonDrawer>(color, dashed, position, points, radius, offset, rotation);
-        }
-
-        /// <summary>
-        /// Draws a circle in world space with the main camera position.
-        /// </summary>
-        public static void Circle(Vector3 position, float radius, Color? color = null, bool dashed = false)
-        {
-            Camera currentCamera = GizmosInstance.currentRenderingCamera;
-            Quaternion rotation = Quaternion.identity;
-            if (currentCamera != null)
-            {
-                rotation = currentCamera.transform.rotation;
-            }
-
-            Circle(position, radius, rotation, color, dashed);
+            Draw<PolygonDrawer>(color, dashed, position, pointsCount, radius, offset, rotation);
         }
     }
 }
