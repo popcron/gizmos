@@ -188,10 +188,35 @@ namespace Popcron
         {
             OnRendered(camera);
         }
-        
-        private void OnRendered(Camera camera){
-            // Disallow gizmo rendering to cameras that not fits to predicate
-            if(camera.name != "SceneCamera" && !Gizmos.CameraPredicate.Invoke(camera)) return;
+
+        private bool ShouldRenderCamera(Camera camera)
+        {
+            if (!camera)
+            {
+                return false;
+            }
+
+            //allow the scene camera always
+            if (camera.name == "SceneCamera")
+            {
+                return true;
+            }
+
+            //it passed through the filter
+            if (Gizmos.CameraFilter?.Invoke(camera) == true)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private void OnRendered(Camera camera)
+        {
+            if (!ShouldRenderCamera(camera))
+            {
+                return;
+            }
 
             Vector3 offset = Gizmos.Offset;
             Material.SetPass(0);
@@ -216,7 +241,10 @@ namespace Popcron
             float dashGap = Mathf.Clamp(Gizmos.DashGap, 0.01f, 32f);
             for (int e = 0; e < queue.Length; e++)
             {
-                if (!queue[e].active) continue;
+                if (!queue[e].active)
+                {
+                    continue;
+                }
 
                 //set to inactive
                 queue[e].active = false;

@@ -15,6 +15,8 @@ namespace Popcron
         private static Plane[] cameraPlanes = new Plane[6];
         private static Vector3[] buffer = new Vector3[BufferSize];
 
+        public static Func<Camera, bool> CameraFilter = cam => false;
+
         /// <summary>
         /// The size of the total gizmos buffer.
         /// </summary>
@@ -90,8 +92,6 @@ namespace Popcron
                 }
             }
         }
-
-        public static Func<Camera, bool> CameraPredicate = cam => false;
 
         [Obsolete("This property is obsolete. Use FrustumCulling instead.", false)]
         public static bool Cull
