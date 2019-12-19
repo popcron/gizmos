@@ -9,12 +9,14 @@ Used for drawing runtime gizmos in builds and editor from any context in the cod
 - Git
 
 ## Installation
-To install for use in Unity, copy everything from this repository to `<YourUnityProject>/Packages/Popcron.Gizmos` folder.
+To install for local use, download this repo and copy everything from this repository to `<YourUnityProject>/Packages/Popcron Gizmos` folder.
 
 If using 2018.3.x or higher, you can add a new entry to the manifest.json file in your Packages folder:
 ```json
 "com.popcron.gizmos": "https://github.com/popcron/gizmos.git"
 ```
+
+The package checks for updates every time a compile happens, and it will say so under the `Popcron/Gizmos/Update` menu if one is available, upon pressing it will make unity update the package to the latest version thats here on github. Though you can always edit it yourself if you'd like. 
 
 ## Example
 ```cs
