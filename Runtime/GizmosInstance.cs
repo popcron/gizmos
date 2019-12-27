@@ -26,7 +26,7 @@ namespace Popcron
     [AddComponentMenu("")]
     public class GizmosInstance : MonoBehaviour
     {
-        private const int DefaultQueueSize = 512;
+        private const int DefaultQueueSize = 4096;
 
         private static GizmosInstance instance;
         private static bool hotReloaded = true;
@@ -140,10 +140,17 @@ namespace Popcron
         {
             GizmosInstance inst = GetOrCreate();
 
-            //excedeed the length, so loopback
-            if (inst.queueIndex >= DefaultQueueSize)
+            //excedeed the length, so make it even bigger
+            if (inst.queueIndex >= inst.queue.Length)
             {
-                inst.queueIndex = 0;
+                Element[] bigger = new Element[inst.queue.Length + DefaultQueueSize];
+                for (int i = inst.queue.Length; i < bigger.Length; i++)
+                {
+                    bigger[i] = new Element();
+                }
+
+                Array.Copy(inst.queue, 0, bigger, 0, inst.queue.Length);
+                inst.queue = bigger;
             }
 
             inst.queue[inst.queueIndex].active = true;
@@ -328,6 +335,7 @@ namespace Popcron
 
             GL.End();
             GL.PopMatrix();
+            instance.queueIndex = 0;
         }
     }
 }

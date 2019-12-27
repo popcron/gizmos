@@ -14,10 +14,15 @@ namespace Popcron
 
         private static Vector3[] buffer = new Vector3[BufferSize];
 
+        /// <summary>
+        /// By default, it will always render to scene view camera and the main camera.
+        /// Subscribing to this allows you to whitelist your custom cameras.
+        /// </summary>
         public static Func<Camera, bool> CameraFilter = cam => false;
 
         /// <summary>
         /// The size of the total gizmos buffer.
+        /// Default is 4096.
         /// </summary>
         public static int BufferSize
         {
@@ -70,6 +75,7 @@ namespace Popcron
 
         /// <summary>
         /// The size of the gap when drawing dashed elements.
+        /// Default gap size is 0.1
         /// </summary>
         public static float DashGap
         {

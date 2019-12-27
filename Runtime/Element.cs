@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace Popcron
 {
-    [Serializable]
     internal class Element
     {
         public bool active = false;
