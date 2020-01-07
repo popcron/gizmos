@@ -5,10 +5,12 @@ namespace Popcron
 {
     public class Gizmos
     {
+        private static string _prefsKey = null;
         private static int? _bufferSize = null;
         private static bool? _enabled = null;
         private static float? _dashGap = null;
         private static bool? _cull = null;
+        private static int? _pass = null;
         private static Vector3? _offset = null;
 
         private static Vector3[] buffer = new Vector3[BufferSize];
@@ -18,6 +20,19 @@ namespace Popcron
         /// Subscribing to this allows you to whitelist your custom cameras.
         /// </summary>
         public static Func<Camera, bool> CameraFilter = cam => false;
+
+        private static string PrefsKey
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_prefsKey))
+                {
+                    _prefsKey = $"{SystemInfo.deviceUniqueIdentifier}.{Application.companyName}.{Application.productName}.{Constants.UniqueIdentifier}";
+                }
+
+                return _prefsKey;
+            }
+        }
 
         /// <summary>
         /// The size of the total gizmos buffer.
@@ -29,9 +44,9 @@ namespace Popcron
             {
                 if (_bufferSize == null)
                 {
-                    _bufferSize = PlayerPrefs.GetInt(Application.buildGUID + Constants.UniqueIdentifier + ".BufferSize", 4096);
+                    _bufferSize = PlayerPrefs.GetInt($"{PrefsKey}.BufferSize", 4096);
                 }
-                
+
                 return _bufferSize.Value;
             }
             set
@@ -40,14 +55,14 @@ namespace Popcron
                 if (_bufferSize != value)
                 {
                     _bufferSize = value;
-                    PlayerPrefs.SetInt(Application.buildGUID + Constants.UniqueIdentifier + ".BufferSize", value);
-                    
+                    PlayerPrefs.SetInt($"{PrefsKey}.BufferSize", value);
+
                     //buffer size changed, so recreate the buffer array too
                     buffer = new Vector3[value];
                 }
             }
         }
-        
+
         /// <summary>
         /// Toggles wether the gizmos could be drawn or not.
         /// </summary>
@@ -57,7 +72,7 @@ namespace Popcron
             {
                 if (_enabled == null)
                 {
-                    _enabled = PlayerPrefs.GetInt(Application.buildGUID + Constants.UniqueIdentifier + ".Enabled", 1) == 1;
+                    _enabled = PlayerPrefs.GetInt($"{PrefsKey}.Enabled", 1) == 1;
                 }
 
                 return _enabled.Value;
@@ -67,7 +82,7 @@ namespace Popcron
                 if (_enabled != value)
                 {
                     _enabled = value;
-                    PlayerPrefs.SetInt(Application.buildGUID + Constants.UniqueIdentifier + ".Enabled", value ? 1 : 0);
+                    PlayerPrefs.SetInt($"{PrefsKey}.Enabled", value ? 1 : 0);
                 }
             }
         }
@@ -82,7 +97,7 @@ namespace Popcron
             {
                 if (_dashGap == null)
                 {
-                    _dashGap = PlayerPrefs.GetFloat(Application.buildGUID + Constants.UniqueIdentifier + ".DashGap", 0.1f);
+                    _dashGap = PlayerPrefs.GetFloat($"{PrefsKey}.DashGap", 0.1f);
                 }
 
                 return _dashGap.Value;
@@ -92,7 +107,7 @@ namespace Popcron
                 if (_dashGap != value)
                 {
                     _dashGap = value;
-                    PlayerPrefs.SetFloat(Application.buildGUID + Constants.UniqueIdentifier + ".DashGap", value);
+                    PlayerPrefs.SetFloat($"{PrefsKey}.DashGap", value);
                 }
             }
         }
@@ -129,7 +144,7 @@ namespace Popcron
             {
                 if (_cull == null)
                 {
-                    _cull = PlayerPrefs.GetInt(Application.buildGUID + Constants.UniqueIdentifier + ".Cull", 1) == 1;
+                    _cull = PlayerPrefs.GetInt($"{PrefsKey}.FrustumCulling", 1) == 1;
                 }
 
                 return _cull.Value;
@@ -139,7 +154,7 @@ namespace Popcron
                 if (_cull != value)
                 {
                     _cull = value;
-                    PlayerPrefs.SetInt(Application.buildGUID + Constants.UniqueIdentifier + ".Cull", value ? 1 : 0);
+                    PlayerPrefs.SetInt($"{PrefsKey}.FrustumCulling", value ? 1 : 0);
                 }
             }
         }
@@ -149,13 +164,31 @@ namespace Popcron
         /// </summary>
         public static Material Material
         {
+            get => GizmosInstance.Material;
+            set => GizmosInstance.Material = value;
+        }
+
+        /// <summary>
+        /// Rendering pass to activate.
+        /// </summary>
+        public static int Pass
+        {
             get
             {
-                return GizmosInstance.Material;
+                if (_pass == null)
+                {
+                    _pass = PlayerPrefs.GetInt($"{PrefsKey}.Pass", 0);
+                }
+
+                return _pass.Value;
             }
             set
             {
-                GizmosInstance.Material = value;
+                if (_pass != value)
+                {
+                    _pass = value;
+                    PlayerPrefs.SetInt($"{PrefsKey}.Pass", value);
+                }
             }
         }
 
@@ -169,7 +202,7 @@ namespace Popcron
                 const string Delim = ",";
                 if (_offset == null)
                 {
-                    string data = PlayerPrefs.GetString(Application.buildGUID + Constants.UniqueIdentifier, 0 + Delim + 0 + Delim + 0);
+                    string data = PlayerPrefs.GetString($"{PrefsKey}.Offset", 0 + Delim + 0 + Delim + 0);
                     int indexOf = data.IndexOf(Delim);
                     int lastIndexOf = data.LastIndexOf(Delim);
                     if (indexOf + lastIndexOf > 0)
@@ -191,7 +224,7 @@ namespace Popcron
                 if (_offset != value)
                 {
                     _offset = value;
-                    PlayerPrefs.SetString(Application.buildGUID + Constants.UniqueIdentifier, value.x + Delim + value.y + Delim + value.y);
+                    PlayerPrefs.SetString($"{PrefsKey}.Offset", value.x + Delim + value.y + Delim + value.y);
                 }
             }
         }
@@ -214,8 +247,21 @@ namespace Popcron
                 //copy from buffer and add to the queue
                 Vector3[] array = new Vector3[points];
                 Array.Copy(buffer, array, points);
-                GizmosInstance.Add(array, color, dashed);
+                GizmosInstance.Submit(array, color, dashed);
             }
+        }
+
+        /// <summary>
+        /// Draws an array of lines. Useful for things like paths.
+        /// </summary>
+        public static void Lines(Vector3[] lines, Color? color = null, bool dashed = false)
+        {
+            if (!Enabled)
+            {
+                return;
+            }
+
+            GizmosInstance.Submit(lines, color, dashed);
         }
 
         /// <summary>

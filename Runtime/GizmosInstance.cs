@@ -159,7 +159,10 @@ namespace Popcron
             }
         }
 
-        internal static void Add(Vector3[] points, Color? color, bool dashed)
+        /// <summary>
+        /// Submits an array of points to draw into the queue.
+        /// </summary>
+        internal static void Submit(Vector3[] points, Color? color, bool dashed)
         {
             GizmosInstance inst = GetOrCreate();
 
@@ -280,13 +283,20 @@ namespace Popcron
 
         private void OnRendered(Camera camera)
         {
+            //shouldnt be rendering
+            if (!Gizmos.Enabled)
+            {
+                queueIndex = 0;
+            }
+
+            //check if this camera is ok to render with
             if (!ShouldRenderCamera(camera))
             {
                 return;
             }
 
             Vector3 offset = Gizmos.Offset;
-            Material.SetPass(0);
+            Material.SetPass(Gizmos.Pass);
 
             GL.PushMatrix();
             GL.Begin(GL.LINES);

@@ -29,7 +29,11 @@ namespace Popcron
                     Type[] types = assembly.GetTypes();
                     foreach (Type type in types)
                     {
-                        if (type.IsAbstract) continue;
+                        if (type.IsAbstract)
+                        {
+                            continue;
+                        }
+
                         if (type.IsSubclassOf(typeof(Drawer)))
                         {
                             Drawer value = (Drawer)Activator.CreateInstance(type);
@@ -39,8 +43,7 @@ namespace Popcron
                 }
             }
 
-            Drawer drawer;
-            if (typeToDrawer.TryGetValue(typeof(T), out drawer))
+            if (typeToDrawer.TryGetValue(typeof(T), out Drawer drawer))
             {
                 return drawer;
             }
