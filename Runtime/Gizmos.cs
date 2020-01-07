@@ -10,7 +10,6 @@ namespace Popcron
         private static float? _dashGap = null;
         private static bool? _cull = null;
         private static Vector3? _offset = null;
-        private static Camera _camera = null;
 
         private static Vector3[] buffer = new Vector3[BufferSize];
 

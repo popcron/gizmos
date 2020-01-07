@@ -1,10 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 #if UNITY_EDITOR
+using UnityEditor;
 using UnityEditor.SceneManagement;
 #endif
 
@@ -35,6 +37,7 @@ namespace Popcron
 
         private Material overrideMaterial;
         private int queueIndex = 0;
+        private int lastFrame;
         private Element[] queue = new Element[DefaultQueueSize];
 
         /// <summary>
@@ -115,7 +118,7 @@ namespace Popcron
                 //none were found, create a new one
                 if (!instance)
                 {
-                    instance = new GameObject("Popcron.Gizmos.GizmosInstance").AddComponent<GizmosInstance>();
+                    instance = new GameObject(typeof(GizmosInstance).FullName).AddComponent<GizmosInstance>();
                     instance.gameObject.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
 
                     markDirty = true;
@@ -136,9 +139,36 @@ namespace Popcron
             return instance;
         }
 
+        private float CurrentTime
+        {
+            get
+            {
+                float time = 0f;
+                if (Application.isPlaying)
+                {
+                    time = Time.time;
+                }
+                else
+                {
+#if UNITY_EDITOR
+                    time = (float)EditorApplication.timeSinceStartup;
+#endif
+                }
+
+                return time;
+            }
+        }
+
         internal static void Add(Vector3[] points, Color? color, bool dashed)
         {
             GizmosInstance inst = GetOrCreate();
+
+            //if new frame, reset index
+            if (inst.lastFrame != Time.frameCount)
+            {
+                inst.lastFrame = Time.frameCount;
+                inst.queueIndex = 0;
+            }
 
             //excedeed the length, so make it even bigger
             if (inst.queueIndex >= inst.queue.Length)
@@ -153,7 +183,6 @@ namespace Popcron
                 inst.queue = bigger;
             }
 
-            inst.queue[inst.queueIndex].active = true;
             inst.queue[inst.queueIndex].color = color ?? Color.white;
             inst.queue[inst.queueIndex].points = points;
             inst.queue[inst.queueIndex].dashed = dashed;
@@ -192,10 +221,7 @@ namespace Popcron
             }
         }
 
-        private void OnRendered(ScriptableRenderContext context, Camera camera)
-        {
-            OnRendered(camera);
-        }
+        private void OnRendered(ScriptableRenderContext context, Camera camera) => OnRendered(camera);
 
         private bool ShouldRenderCamera(Camera camera)
         {
@@ -205,7 +231,20 @@ namespace Popcron
             }
 
             //allow the scene and main camera always
-            if (camera.name == "SceneCamera" || camera.CompareTag("MainCamera"))
+            bool isSceneCamera = false;
+#if UNITY_EDITOR
+            SceneView sceneView = SceneView.currentDrawingSceneView;
+            if (sceneView == null)
+            {
+                sceneView = SceneView.lastActiveSceneView;
+            }
+
+            if (sceneView != null && sceneView.camera == camera)
+            {
+                isSceneCamera = true;
+            }
+#endif
+            if (isSceneCamera || camera.CompareTag("MainCamera"))
             {
                 return true;
             }
@@ -252,33 +291,24 @@ namespace Popcron
             GL.PushMatrix();
             GL.Begin(GL.LINES);
 
-            //draw elements
-            float time = 0f;
-            if (Application.isPlaying)
-            {
-                time = Time.time;
-            }
-            else
-            {
-#if UNITY_EDITOR
-                time = (float)UnityEditor.EditorApplication.timeSinceStartup;
-#endif
-            }
-
-            bool alt = time % 1 > 0.5f;
+            bool alt = CurrentTime % 1 > 0.5f;
             float dashGap = Mathf.Clamp(Gizmos.DashGap, 0.01f, 32f);
+            bool frustumCull = Gizmos.FrustumCulling;
             List<Vector3> points = new List<Vector3>();
-            for (int e = 0; e < queue.Length; e++)
+
+            //draw le elements
+            for (int e = 0; e < queueIndex; e++)
             {
-                Element element = queue[e];
-                if (!element.active)
+                //just in case
+                if (queue.Length <= e)
                 {
-                    continue;
+                    break;
                 }
-                element.active = false;
+
+                Element element = queue[e];
 
                 //dont render this thingy if its not inside the frustum
-                if (Gizmos.FrustumCulling)
+                if (frustumCull)
                 {
                     if (!IsVisibleByCamera(element, camera))
                     {
@@ -335,7 +365,6 @@ namespace Popcron
 
             GL.End();
             GL.PopMatrix();
-            instance.queueIndex = 0;
         }
     }
 }
