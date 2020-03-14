@@ -280,9 +280,17 @@ namespace Popcron
 
             return false;
         }
+		
+		private void Update()
+		{
+			//always render something
+			Gizmos.Line(default, default);
+		}
 
         private void OnRendered(Camera camera)
         {
+            Material.SetPass(Gizmos.Pass);
+			
             //shouldnt be rendering
             if (!Gizmos.Enabled)
             {
@@ -292,11 +300,17 @@ namespace Popcron
             //check if this camera is ok to render with
             if (!ShouldRenderCamera(camera))
             {
+				GL.PushMatrix();
+				GL.Begin(GL.LINES);
+				
+				//bla bla bla
+				
+				GL.End();
+				GL.PopMatrix();
                 return;
             }
 
             Vector3 offset = Gizmos.Offset;
-            Material.SetPass(Gizmos.Pass);
 
             GL.PushMatrix();
             GL.Begin(GL.LINES);
