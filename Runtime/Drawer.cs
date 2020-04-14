@@ -11,7 +11,7 @@ namespace Popcron
 
         public abstract int Draw(ref Vector3[] buffer, params object[] args);
 
-        protected Drawer()
+        public Drawer()
         {
 
         }
@@ -23,6 +23,13 @@ namespace Popcron
             {
                 typeToDrawer = new Dictionary<Type, Drawer>();
 
+                //add defaults
+				typeToDrawer.Add(typeof(CubeDrawer)) = new CubeDrawer();
+				typeToDrawer.Add(typeof(LineDrawer)) = new LineDrawer();
+				typeToDrawer.Add(typeof(PolygonDrawer)) = new PolygonDrawer();
+				typeToDrawer.Add(typeof(SquareDrawer)) = new SquareDrawer();
+
+				//find extras
                 Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
                 foreach (Assembly assembly in assemblies)
                 {
@@ -34,10 +41,17 @@ namespace Popcron
                             continue;
                         }
 
-                        if (type.IsSubclassOf(typeof(Drawer)))
+                        if (type.IsSubclassOf(typeof(Drawer)) && !typeToDrawer.ContainsKey(type))
                         {
-                            Drawer value = (Drawer)Activator.CreateInstance(type);
-                            typeToDrawer.Add(type, value);
+                            try
+                            {
+                                Drawer value = (Drawer)Activator.CreateInstance(type);
+							    typeToDrawer[type] = value;
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.LogError($"couldnt register drawer of type {type} because {e.Message}");
+                            }
                         }
                     }
                 }

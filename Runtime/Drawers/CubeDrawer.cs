@@ -4,6 +4,11 @@ namespace Popcron
 {
     public class CubeDrawer : Drawer
     {
+		public CubeDrawer()
+		{
+			
+		}
+		
         public override int Draw(ref Vector3[] buffer, params object[] values)
         {
             Vector3 position = (Vector3)values[0];
