@@ -24,10 +24,10 @@ namespace Popcron
                 typeToDrawer = new Dictionary<Type, Drawer>();
 
                 //add defaults
-				typeToDrawer.Add(typeof(CubeDrawer)) = new CubeDrawer();
-				typeToDrawer.Add(typeof(LineDrawer)) = new LineDrawer();
-				typeToDrawer.Add(typeof(PolygonDrawer)) = new PolygonDrawer();
-				typeToDrawer.Add(typeof(SquareDrawer)) = new SquareDrawer();
+				typeToDrawer.Add(typeof(CubeDrawer), CubeDrawer());
+				typeToDrawer.Add(typeof(LineDrawer), LineDrawer());
+				typeToDrawer.Add(typeof(PolygonDrawer),new PolygonDrawer());
+				typeToDrawer.Add(typeof(SquareDrawer), new SquareDrawer());
 
 				//find extras
                 Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
