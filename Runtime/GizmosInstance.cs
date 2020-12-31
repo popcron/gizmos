@@ -313,6 +313,7 @@ namespace Popcron
             Vector3 offset = Gizmos.Offset;
 
             GL.PushMatrix();
+            GL.MultMatrix(Matrix4x4.identity);
             GL.Begin(GL.LINES);
 
             bool alt = CurrentTime % 1 > 0.5f;
