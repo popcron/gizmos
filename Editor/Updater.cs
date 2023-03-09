@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.Callbacks;
@@ -8,6 +10,7 @@ using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
+using Ping = System.Net.NetworkInformation.Ping;
 
 public class Updater : Editor
 {
@@ -24,20 +27,52 @@ public class Updater : Editor
 
     private static async Task<bool> IsUpdateAvailable()
     {
-        WebClient wc = new WebClient();
-        string json = await wc.DownloadStringTaskAsync(PackageURL);
-        string versionText = JsonUtility.FromJson<Package>(json).version;
-        Version version = Version.Parse(versionText);
-        Version currentVersion = await GetLocalVersion();
-
-        if (currentVersion != null)
+        Uri uri = new ("https://www.google.com/");
+        IPStatus result = await Task.Run(() => IsHostReachable(uri.Host));
+        if (result == IPStatus.Success)
         {
-            bool updateAvailable = currentVersion.CompareTo(version) < 0;
-            return updateAvailable;
+            // Try to check for update
+            WebClient wc = new WebClient();
+            string json = await wc.DownloadStringTaskAsync(PackageURL);
+            string versionText = JsonUtility.FromJson<Package>(json).version;
+            Version version = Version.Parse(versionText);
+            Version currentVersion = await GetLocalVersion();
+            if (currentVersion != null)
+            {
+                bool updateAvailable = currentVersion.CompareTo(version) < 0;
+                return updateAvailable;
+            }
         }
-        else
+
+        return false;
+    }
+
+    private static IPStatus IsHostReachable(string ip)
+    {
+        if (!NetworkInterface.GetIsNetworkAvailable())
         {
-            return false;
+            return IPStatus.DestinationUnreachable;
+        }
+
+        Ping pinger = new();
+        try
+        {
+            // Wait at most 2 seconds for the ICMP echo reply message
+            int timeout = 2000;
+            PingReply reply = pinger.Send(ip, timeout);
+            return reply.Status;
+        }
+        catch (PingException)
+        {
+            return IPStatus.DestinationUnreachable;
+        }
+        catch (SocketException)
+        {
+            return IPStatus.DestinationUnreachable;
+        }
+        finally
+        {
+            pinger.Dispose();
         }
     }
 
