@@ -27,7 +27,7 @@ public class Updater : Editor
 
     private static async Task<bool> IsUpdateAvailable()
     {
-        Uri uri = new ("https://www.google.com/");
+        Uri uri = new Uri("https://www.google.com/");
         IPStatus result = await Task.Run(() => IsHostReachable(uri.Host));
         if (result == IPStatus.Success)
         {
@@ -54,7 +54,7 @@ public class Updater : Editor
             return IPStatus.DestinationUnreachable;
         }
 
-        Ping pinger = new();
+        Ping pinger = new Ping();
         try
         {
             // Wait at most 2 seconds for the ICMP echo reply message
