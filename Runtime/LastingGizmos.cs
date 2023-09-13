@@ -106,15 +106,15 @@ namespace Popcron
         /// </summary>
         public static void Square(Vector2 position, Vector2 size, Color? color = null, bool dashed = false, float time = 1)
         {
-            Square(position, Quaternion.identity, size, color, dashed);
+            Square(position, Quaternion.identity, size, color, dashed, time);
         }
 
         /// <summary>
         /// Draw square in world space with float diameter parameter.
         /// </summary>
-        public static void Square(Vector2 position, float diameter, Color? color = null, bool dashed = false)
+        public static void Square(Vector2 position, float diameter, Color? color = null, bool dashed = false, float time = 1)
         {
-            Square(position, Quaternion.identity, Vector2.one * diameter, color, dashed);
+            Square(position, Quaternion.identity, Vector2.one * diameter, color, dashed, time);
         }
 
         /// <summary>
