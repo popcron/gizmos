@@ -193,6 +193,23 @@ namespace Popcron
             inst.queueIndex++;
         }
 
+        internal static Coroutine DoForLong(Action action, float time)
+        {
+            IEnumerator Coroutine(Action action, float time)
+            {
+                var endTime = Time.time + time;
+                while (Time.time < endTime)
+                {
+                    action.Invoke();
+                    yield return null;
+                }
+            }
+            
+            GizmosInstance inst = GetOrCreate();
+
+            return inst.StartCoroutine(Coroutine(action, time));
+        }
+
         private void OnEnable()
         {
             //populate queue with empty elements
