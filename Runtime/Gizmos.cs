@@ -245,9 +245,10 @@ namespace Popcron
                 int points = drawer.Draw(ref buffer, args);
 
                 //copy from buffer and add to the queue
-                Vector3[] array = new Vector3[points];
+                Vector3[] array = ArrayPool<Vector3>.Shared.Rent(points);
                 Array.Copy(buffer, array, points);
                 GizmosInstance.Submit(array, color, dashed);
+                ArrayPool<Vector3>.Shared.Return(array);
             }
         }
 
